@@ -10,7 +10,7 @@ import tools
 log = logging.getLogger()
 from uyubase.base.usession import uyu_check_session, uyu_check_session_for_page
 from uyubase.base.response import success, error, UAURET
-from uyubase.uyu.define import UYU_SYS_ROLE_OP, UYU_OP_OK, UYU_OP_ERR, UYU_CHAN_MAP
+from uyubase.uyu.define import UYU_SYS_ROLE_CHAN, UYU_OP_OK, UYU_OP_ERR, UYU_CHAN_MAP
 from uyubase.base.uyu_user import UUser
 from uyubase.uyu import define
 
@@ -21,7 +21,7 @@ import logging
 log = logging.getLogger()
 
 class ChannelManage(core.Handler):
-    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     def GET(self):
         self.write(template.render('channel.html'))
 
@@ -32,7 +32,7 @@ class ChanStateSetHandler(core.Handler):
         Field('state', T_INT, False),
     ]
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         if not self.user.sauth:
@@ -80,7 +80,7 @@ class ChanHandler(core.Handler):
         Field('is_prepayment', T_INT, False),
     ]
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self):
         if not self.user.sauth:
@@ -110,7 +110,7 @@ class ChanHandler(core.Handler):
         log.debug("ret: %s", ret)
         self.write(ret)
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         if not self.user.sauth:
@@ -257,7 +257,7 @@ class CreateChanHandler(core.Handler):
         Field('channel_name', T_STR, False),
     ]
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self, *args):
         if not self.user.sauth:
@@ -297,7 +297,7 @@ class CreateChanHandler(core.Handler):
 
 class ChanNameList(core.Handler):
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_database('uyu_core')
     def GET(self):
         sql = "select id, channel_name, training_amt_per, is_prepayment from channel where is_valid=0"
@@ -342,7 +342,7 @@ class ChanStoreMap(core.Handler):
         ret = self.db.select(table='stores', fields=['id', 'store_name', 'training_amt_per'], where={'channel_id': channel_id, 'is_valid': 0})
         return ret
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     def GET(self):
         try:
             data = self._get_handler()

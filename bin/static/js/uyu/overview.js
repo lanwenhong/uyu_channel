@@ -1,6 +1,6 @@
 $(document).ready(function(){
     var myid = window.localStorage.getItem('myid');
-    var get_data = {'userid': myid};
+    var get_data = {'userid': myid, 'se_userid': myid};
     $.ajax({
 	    url: '/channel/v1/api/channel',
 	    type: 'GET',
@@ -15,8 +15,13 @@ $(document).ready(function(){
                 toastr.warning(msg);
                 return false;
 			} else {
-                console.log('channel data');
-                console.log*(data.data);
+                channel_data = data.data.chn_data;
+                profile_data = data.data.profile;
+                $('.panel-title').text(channel_data.channel_name);
+                $('#channel_id').text(channel_data.chnid);
+                $('#channel_name').text(channel_data.channel_name);
+                $('#contact_name').text(profile_data.contact_name);
+                $('#contact_phone').text(profile_data.contact_phone);
             }
 	    },
 	    error: function(data) {
