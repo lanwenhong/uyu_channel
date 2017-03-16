@@ -27,7 +27,6 @@ class DeviceInfoHandler(core.Handler):
     _get_handler_fields = [
         Field('page', T_INT, False),
         Field('maxnum', T_INT, False),
-        Field('channel_name', T_STR, True),
         Field('store_name', T_STR, True),
         Field('serial_number', T_STR, True),
     ]
@@ -35,6 +34,7 @@ class DeviceInfoHandler(core.Handler):
     def _get_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
 
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self, *args):
         try:
@@ -42,12 +42,16 @@ class DeviceInfoHandler(core.Handler):
             params = self.validator.data
             curr_page = params.get('page')
             max_page_num = params.get('maxnum')
-            channel_name = params.get('channel_name')
             store_name = params.get('store_name')
             serial_number = params.get('serial_number')
 
+            self.user.load_user()
+            self.user.load_profile()
+            self.user.load_channel()
+            self.user.channel_id = self.user.cdata['id']
+
             start, end = tools.gen_ret_range(curr_page, max_page_num)
-            info_data = self._query_handler(channel_name, store_name, serial_number)
+            info_data = self._query_handler(store_name, serial_number)
 
             data['info'] = self._trans_record(info_data[start:end])
             data['num'] = len(info_data)
@@ -58,8 +62,8 @@ class DeviceInfoHandler(core.Handler):
             return error(UAURET.DATAERR)
 
     @with_database('uyu_core')
-    def _query_handler(self, channel_name=None, store_name=None, serial_number=None):
-        where = {}
+    def _query_handler(self, store_name=None, serial_number=None):
+        where = {'channel_id': self.user.channel_id}
 
         keep_fields = [
             'id', 'device_name', 'hd_version', 'blooth_tag',
@@ -68,13 +72,6 @@ class DeviceInfoHandler(core.Handler):
         ]
 
         other = ' order by ctime desc'
-
-        if channel_name:
-            channel_list = tools.channel_name_to_id(channel_name)
-            if channel_list:
-                where.update({'channel_id': ('in', channel_list)})
-            else:
-                return []
 
         if store_name:
             store_list = tools.store_name_to_id(store_name)
