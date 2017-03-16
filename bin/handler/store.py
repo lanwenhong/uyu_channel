@@ -10,7 +10,7 @@ from uyubase.base.uyu_user import UUser
 
 
 from uyubase.uyu.define import UYU_USER_ROLE_SUPER, UYU_USER_STATE_OK, UYU_USER_ROLE_EYESIGHT
-from uyubase.uyu.define import UYU_SYS_ROLE_OP, UYU_OP_ERR, UYU_STORE_ROLE_MAP, UYU_STORE_STATUS_MAP
+from uyubase.uyu.define import UYU_SYS_ROLE_CHAN, UYU_OP_ERR, UYU_STORE_ROLE_MAP, UYU_STORE_STATUS_MAP
 
 from runtime import g_rt
 from config import cookie_conf
@@ -19,7 +19,7 @@ import tools
 log = logging.getLogger()
 
 class StoreManage(core.Handler):
-    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     def GET(self):
         self.write(template.render('store.html'))
 
@@ -30,7 +30,7 @@ class StoreStateSetHandler(core.Handler):
         Field('state', T_INT, False),
     ]
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         if not self.user.sauth:
@@ -167,7 +167,7 @@ class StoreHandler(core.Handler):
         # Field("store_type", T_INT, False, match=r'^([0-1]{1})$'),
     ]
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         if not self.user.sauth:
@@ -202,7 +202,7 @@ class StoreHandler(core.Handler):
     def POST(self):
         return self._post_handler()
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self):
         if not self.user.sauth:
@@ -244,7 +244,7 @@ class StoreEyeHandler(core.Handler):
         Field('channel_id', T_INT, False, match=r'^([0-9]{0,10})$'),
     ]
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self):
         params = self.validator.data
@@ -311,7 +311,7 @@ class CreateStoreHandler(core.Handler):
         Field('store_name', T_STR, False),
     ]
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         if not self.user.sauth:
@@ -348,7 +348,7 @@ class CreateStoreHandler(core.Handler):
 class StoreNameListHandler(core.Handler):
 
     @with_database('uyu_core')
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     def GET(self):
         sql = "select store_name from stores"
         db_ret = self.db.query(sql)

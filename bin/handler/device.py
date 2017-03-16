@@ -5,9 +5,9 @@ from zbase.web import template
 from zbase.web.validator import with_validator_self, Field, T_REG, T_INT, T_STR
 from zbase.base.dbpool import with_database
 from uyubase.base.response import success, error, UAURET
-from uyubase.uyu.define import UYU_USER_ROLE_SUPER, UYU_USER_STATE_OK, UYU_SYS_ROLE_OP
+from uyubase.uyu.define import UYU_USER_ROLE_SUPER, UYU_USER_STATE_OK, UYU_SYS_ROLE_CHAN
 from uyubase.base.usession import uyu_check_session, uyu_check_session_for_page
-from uyubase.uyu.define import UYU_SYS_ROLE_OP, UYU_OP_OK, UYU_OP_ERR, UYU_CHAN_MAP, UYU_DEVICE_MAP
+from uyubase.uyu.define import UYU_SYS_ROLE_CHAN, UYU_OP_OK, UYU_OP_ERR, UYU_CHAN_MAP, UYU_DEVICE_MAP
 from uyubase.base.uyu_user import UUser
 
 import logging, datetime, time
@@ -17,7 +17,7 @@ from config import cookie_conf
 log = logging.getLogger()
 
 class DeviceManage(core.Handler):
-    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     def GET(self):
         self.write(template.render('device.html'))
 
@@ -131,7 +131,7 @@ class DeviceCreateHandler(core.Handler):
         Field('op', T_INT, True),
     ]
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         if not self.user.sauth:
@@ -167,7 +167,7 @@ class DeviceAllocateHandler(core.Handler):
         Field('store_id', T_INT, True),
     ]
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         if not self.user.sauth:
