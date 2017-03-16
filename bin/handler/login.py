@@ -5,7 +5,7 @@ from zbase.web.validator import with_validator_self, Field, T_REG, T_INT, T_STR
 
 from uyubase.base.response import success, error, UAURET
 
-from uyubase.uyu.define import UYU_SYS_ROLE_OP, UYU_USER_ROLE_SUPER,UYU_OP_ERR
+from uyubase.uyu.define import UYU_SYS_ROLE_CHAN, UYU_USER_ROLE_CHAN, UYU_OP_ERR
 
 from zbase.base.dbpool import with_database
 
@@ -49,13 +49,18 @@ class ChangePassHandler(core.Handler):
         ret = self._post_handler(self, args)
         self.write(ret)
 
+
 class LoginHandler(core.Handler):
     _post_handler_fields = [
         Field('mobile', T_REG, False, match=r'^(1\d{10})$'),
         Field('password', T_STR, False),
     ]
 
-    @uyu_set_cookie(g_rt.redis_pool, cookie_conf, UYU_USER_ROLE_SUPER)
+    def _post_handler_errfunc(self, msg):
+        return error(UAURET.PARAMERR, respmsg=msg)
+
+
+    @uyu_set_cookie(g_rt.redis_pool, cookie_conf, UYU_USER_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self, *args):
         params = self.validator.data
@@ -63,7 +68,7 @@ class LoginHandler(core.Handler):
         password = params["password"]
 
         u_op = UUser()
-        ret = u_op.call("check_userlogin", mobile, password, UYU_SYS_ROLE_OP)
+        ret = u_op.call("check_userlogin", mobile, password, UYU_SYS_ROLE_CHAN)
         if not u_op.login or ret == UYU_OP_ERR:
             log.warn("mobile: %s login forbidden", mobile)
             return error(UAURET.USERERR)
@@ -75,6 +80,7 @@ class LoginHandler(core.Handler):
     def POST(self, *args):
         ret = self._post_handler(args)
         return ret
+
 
 class SmsHandler(core.Handler):
     _post_handler_fields = [

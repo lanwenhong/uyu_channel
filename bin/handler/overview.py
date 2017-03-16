@@ -6,7 +6,7 @@ from zbase.web import template
 from uyubase.base.response import success, error, UAURET
 from uyubase.base.usession import uyu_check_session, USession, uyu_check_session_for_page
 from uyubase.base.uyu_user import UUser
-from uyubase.uyu.define import UYU_USER_ROLE_SUPER, UYU_USER_STATE_OK, UYU_SYS_ROLE_OP
+from uyubase.uyu.define import UYU_USER_ROLE_SUPER, UYU_USER_STATE_OK, UYU_SYS_ROLE_CHAN
 from zbase.web.validator import with_validator_self, Field, T_REG, T_INT, T_STR
 from zbase.base.dbpool import with_database
 
@@ -18,7 +18,7 @@ log = logging.getLogger()
 
 
 class OverView(core.Handler):
-    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     def GET(self):
         self.write(template.render('overview.html'))
 
