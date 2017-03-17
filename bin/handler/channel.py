@@ -318,12 +318,11 @@ class ChanNameList(core.Handler):
 class ChanStoreMap(core.Handler):
 
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
-    @with_validator_self
     def _get_handler(self, *args):
         try:
-            params = self.validator.data
-            self.user.load_info_by_userid(self.user.userid)
-            channel_id = self.user.cdata['chnid']
+            uop = UUser()
+            uop.call('load_info_by_userid', self.user.userid)
+            channel_id = uop.cdata['chnid']
             print '------', channel_id
             data = self._query_handler(channel_id)
             return success(data)

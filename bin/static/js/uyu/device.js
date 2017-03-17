@@ -116,6 +116,7 @@ $(document).ready(function(){
 
     $("#deviceCreate").click(function(){
         $("#deviceCreateForm").resetForm();
+        do_first_select('#store_name');
         $("label.error").remove();
         $("#deviceCreateModal").modal();
     });
@@ -330,44 +331,9 @@ $(document).ready(function(){
 
 });
 
-function channel_name_select(channel_name_tag_id, store_name_tag_id) {
-    var get_data = {};
-    var se_userid = window.localStorage.getItem('myid');
-    get_data['se_userid'] = se_userid;
-    $.ajax({
-        url: '/channel_op/v1/api/chan_name_list',
-        type: 'GET',
-        data: get_data,
-        dataType: 'json',
-        success: function(data) {
-            var respcd = data.respcd;
-            if(respcd != '0000'){
-                var resperr = data.resperr;
-                var respmsg = data.respmsg;
-                var msg = resperr ? resperr : respmsg;
-                toastr.warning(msg);
-            }
-            else {
-                var c_channel_name = $(channel_name_tag_id);
-                for(var i=0; i<data.data.length; i++){
-                    var channel_id = data.data[i].channel_id;
-                    var channel_name = data.data[i].channel_name;
-                    var option_str = $('<option value='+channel_id+'>'+channel_name+'</option>');
-                    option_str.appendTo(c_channel_name);
-                    if(i==0){
-                        do_first_select(channel_id, store_name_tag_id);
-                    }
-                }
-            }
-        },
-        error: function(data) {
-            toastr.warning('请求异常');
-        }
-    });
-}
 
-function do_first_select(channel_id, store_name_tag_id) {
-    $('#store_name').html('');
+function do_first_select(store_name_tag_id) {
+    $(store_name_tag_id).html('');
     var get_data = {};
     var se_userid = window.localStorage.getItem('myid');
     get_data['se_userid'] = se_userid;
