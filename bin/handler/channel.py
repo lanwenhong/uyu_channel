@@ -317,19 +317,14 @@ class ChanNameList(core.Handler):
 
 class ChanStoreMap(core.Handler):
 
-    _get_handler_fields = [
-        Field('channel_id', T_INT, False),
-    ]
-
-    def _get_handler_errfunc(self, msg):
-        return error(UAURET.PARAMERR, respmsg=msg)
-
-
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self, *args):
         try:
             params = self.validator.data
-            channel_id = params.get('channel_id')
+            self.user.load_info_by_userid(self.user.userid)
+            channel_id = self.user.cdata['chnid']
+            print '------', channel_id
             data = self._query_handler(channel_id)
             return success(data)
         except Exception as e:
@@ -342,7 +337,7 @@ class ChanStoreMap(core.Handler):
         ret = self.db.select(table='stores', fields=['id', 'store_name', 'training_amt_per'], where={'channel_id': channel_id, 'is_valid': 0})
         return ret
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
+
     def GET(self):
         try:
             data = self._get_handler()

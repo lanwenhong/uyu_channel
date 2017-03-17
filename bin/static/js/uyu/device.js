@@ -115,10 +115,8 @@ $(document).ready(function(){
     });
 
     $("#deviceCreate").click(function(){
-        $('#channel_name').html('');
         $("#deviceCreateForm").resetForm();
         $("label.error").remove();
-        channel_name_select('#channel_name', '#store_name');
         $("#deviceCreateModal").modal();
     });
 
@@ -373,9 +371,8 @@ function do_first_select(channel_id, store_name_tag_id) {
     var get_data = {};
     var se_userid = window.localStorage.getItem('myid');
     get_data['se_userid'] = se_userid;
-    get_data['channel_id'] = channel_id;
     $.ajax({
-        url: '/channel_op/v1/api/chan_store_list',
+        url: '/channel/v1/api/chan_store_list',
         type: 'GET',
         data: get_data,
         dataType: 'json',
