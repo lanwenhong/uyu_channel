@@ -122,10 +122,7 @@ class DeviceCreateHandler(core.Handler):
         Field('blooth_tag',  T_STR, False),
         Field('scm_tag',  T_STR, True),
         Field('status',  T_INT, True),
-        Field('channel_id', T_INT, False),
         Field('store_id', T_INT, True),
-        Field('training_nums', T_INT, True),
-        Field('op', T_INT, True),
     ]
 
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
@@ -140,11 +137,11 @@ class DeviceCreateHandler(core.Handler):
         blooth_tag = params.get('blooth_tag', None)
         scm_tag = params.get('scm_tag', None)
         status = params.get('status', None)
-        channel_id = params.get('channel_id', None)
         store_id = params.get('store_id', None)
-        training_nums = params.get('training_nums', None)
-        op = params.get('op', None)
-        ret = uop.call("create_device", device_name, hd_version, blooth_tag, scm_tag, status, channel_id, store_id, training_nums, op)
+        uop.call('load_info_by_userid', self.user.userid)
+        channel_id = uop.cdata['chnid']
+        op = uop.udata['phone_num']
+        ret = uop.call("create_device", device_name, hd_version, blooth_tag, scm_tag, status, channel_id, store_id, None, op)
         log.debug('create_device params: %s ret: %s', params, ret)
         if ret == UYU_OP_ERR:
             return error(UAURET.REQERR)
@@ -160,7 +157,6 @@ class DeviceAllocateHandler(core.Handler):
     _post_handler_fields = [
         Field("se_userid", T_INT, False),
         Field('serial_number', T_INT, False),
-        Field('channel_id', T_INT, False),
         Field('store_id', T_INT, True),
     ]
 
@@ -169,11 +165,13 @@ class DeviceAllocateHandler(core.Handler):
     def _post_handler(self):
         if not self.user.sauth:
             return error(UAURET.SESSIONERR)
-        uop = UUser()
         params = self.validator.data
         serial_number = params.get('serial_number')
-        channel_id = params.get('channel_id')
         store_id = params.get('store_id', None)
+
+        uop = UUser()
+        uop.call('load_info_by_userid', self.user.userid)
+        channel_id = uop.cdata['chnid']
         ret = uop.call("allocate_device", channel_id, store_id, serial_number)
         log.debug('allocate_device params: %s ret: %s', params, ret)
         if ret == UYU_OP_ERR:

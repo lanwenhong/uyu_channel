@@ -170,14 +170,12 @@ $(document).ready(function(){
         post_data.blooth_tag = $('#blooth_tag').val();
         post_data.scm_tag = $('#scm_tag').val();
         post_data.status = $('#status').val();
-        post_data.channel_id = $('#channel_name').val();
         var store_id = $('#store_name').val();
-        if(store_id){
+		if(store_id){
             post_data.store_id = store_id;
-        }
-
+		}
         $.ajax({
-            url: '/channel_op/v1/api/create_device',
+            url: '/channel/v1/api/create_device',
             type: 'POST',
             dataType: 'json',
             data: post_data,
@@ -239,7 +237,6 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.device-allocate', function(){
-        $('#a_channel_name').html('');
         $('#a_store_name').html('');
         var device_name = $(this).data('device_name');
         var serial_number = $(this).data('serial_number');
@@ -247,7 +244,7 @@ $(document).ready(function(){
         $('#deviceAllocateForm').resetForm();
         $('#a_device_name').val(device_name);
         $('#a_serial_number').val(serial_number);
-        channel_name_select('#a_channel_name', '#a_store_name');
+        do_first_select('#a_store_name');
         $('#deviceAllocate').modal();
     });
 
@@ -289,22 +286,19 @@ $(document).ready(function(){
 
     $('#deviceAllocateSubmit').click(function () {
         var serial_number = $('#a_serial_number').val();
-        var channel_id = $('#a_channel_name').val();
         var store_id = $('#a_store_name').val();
-        if(!channel_id){
-            toastr.warning('请选择分配的渠道');
+        if(!store_id){
+            toastr.warning('请核实分配的门店');
             return false;
         }
         var post_data = {};
         var se_userid = window.localStorage.getItem('myid');
         post_data.se_userid = se_userid;
         post_data.serial_number = serial_number;
-        post_data.channel_id = channel_id;
-        if(store_id){
-            post_data.store_id = store_id;
-        }
+        post_data.store_id = store_id;
+
         $.ajax({
-            url: '/channel_op/v1/api/allocate_device',
+            url: '/channel/v1/api/allocate_device',
             type: 'POST',
             dataType: 'json',
             data: post_data,
@@ -317,7 +311,7 @@ $(document).ready(function(){
                     toastr.warning(msg);
                 }
                 else {
-                    toastr.success('新建设备成功');
+                    toastr.success('设备分配成功');
                     $("#deviceAllocate").modal('hide');
                     $('#deviceList').DataTable().draw();
                 }
@@ -327,7 +321,6 @@ $(document).ready(function(){
             }
         });
     })
-
 
 });
 
