@@ -57,7 +57,7 @@ $(document).ready(function(){
                 get_data.store_name = store_name;
             }
             $.ajax({
-	            url: '/channel_op/v1/api/storeinfo_pagelist',
+	            url: '/channel/v1/api/storeinfo_pagelist',
 	            type: 'GET',
 	            dataType: 'json',
 	            data: get_data,

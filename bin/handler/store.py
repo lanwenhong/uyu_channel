@@ -61,6 +61,7 @@ class StoreInfoHandler(core.Handler):
     def _get_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
 
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self, *args):
         try:
@@ -70,6 +71,11 @@ class StoreInfoHandler(core.Handler):
             max_page_num = params.get('maxnum')
             channel_name = params.get('channel_name')
             store_name = params.get('store_name')
+
+            uop = UUser()
+            uop.call('load_info_by_userid', self.user.userid)
+            print '------', uop.cdata
+            self.channel_id = uop.cdata['chnid']
 
             start, end = tools.gen_ret_range(curr_page, max_page_num)
             info_data = self._query_handler(channel_name, store_name)
@@ -84,7 +90,7 @@ class StoreInfoHandler(core.Handler):
 
     @with_database('uyu_core')
     def _query_handler(self, channel_name=None, store_name=None):
-        where = {}
+        where = {'channel_id': self.channel_id}
         if channel_name:
             where.update({'channel_name': channel_name})
         if store_name:
