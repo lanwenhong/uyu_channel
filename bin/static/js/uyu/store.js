@@ -141,6 +141,11 @@ $(document).ready(function(){
         var se_userid = window.localStorage.getItem('myid');
         var is_prepayment = window.localStorage.getItem('is_prepayment');
         if(is_prepayment == 0){
+            //次卡
+            $('#create_store_divide_percent').hide();
+        } else {
+            //分成
+            $('#create_store_divide_percent').show();
         }
         $("#storeCreateForm").resetForm();
         $("label.error").remove();
