@@ -148,7 +148,6 @@ class StoreHandler(core.Handler):
     _post_handler_fields = [
         Field("se_userid", T_INT, False),
         Field('userid', T_INT, False),
-        # Field('login_name', T_REG, False, match=r'^(1\d{10})$'),
         Field('phone_num', T_REG, False, match=r'^(1\d{10})$'),
         Field('email', T_STR, True, match=r'^[a-zA-Z0-9_\-\'\.]+@[a-zA-Z0-9_]+(\.[a-z]+){1,2}$'),
         #profile信息
@@ -168,13 +167,10 @@ class StoreHandler(core.Handler):
         #门店信息
         Field('training_amt_per', T_INT, False),
         Field('divide_percent', T_FLOAT, True),
-        # Field('is_prepayment', T_INT, False),
-        # Field('channel_id', T_INT, False),
         Field('store_contacter', T_STR, False),
         Field('store_mobile', T_REG, False, match=r'^(1\d{10})$'),
         Field('store_addr', T_STR, False),
         Field('store_name', T_STR, False),
-        # Field("store_type", T_INT, False, match=r'^([0-1]{1})$'),
     ]
 
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
@@ -280,8 +276,12 @@ class StoreEyeHandler(core.Handler):
         try:
             params = self.validator.data
             uop = UUser()
-            uop.store_bind_eyesight(params["userid"], params["store_id"], params["channel_id"])
-            return success({})
+            flag, err_code = uop.store_bind_eyesight(params["userid"], params["store_id"], params["channel_id"])
+            print 'flag', flag, 'err_code', err_code
+            if flag:
+                return success({})
+            else:
+                return error(err_code)
         except Exception as e:
             log.warn(e)
             log.warn(traceback.format_exc())
@@ -313,8 +313,6 @@ class CreateStoreHandler(core.Handler):
         #门店信息
         Field('training_amt_per', T_INT, False),
         Field('divide_percent', T_FLOAT, True),
-        # Field('is_prepayment', T_INT, False),
-        Field('channel_id', T_INT, False),
         Field('store_contacter', T_STR, False),
         Field('store_mobile', T_REG, False, match=r'^(1\d{10})$'),
         Field('store_addr', T_STR, False),
@@ -328,6 +326,8 @@ class CreateStoreHandler(core.Handler):
             return error(UAURET.SESSIONERR)
         params = self.validator.data
         uop = UUser()
+        uop.call('load_info_by_userid', self.user.userid)
+        channel_id = uop.cdata['chnid']
 
         udata = {}
         for key in uop.ukey:
@@ -343,7 +343,7 @@ class CreateStoreHandler(core.Handler):
         for key in uop.skey:
             if params.get(key, None):
                 sdata[key] = params[key]
-
+        sdata['channel_id'] = channel_id
         log.debug("udata: %s pdata: %s sdata: %s", udata, pdata, sdata)
         ret = uop.call("create_store_transaction", udata, pdata, sdata)
         if ret == UYU_OP_ERR:

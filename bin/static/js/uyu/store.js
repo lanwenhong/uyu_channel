@@ -160,10 +160,6 @@ $(document).ready(function(){
 
         var store_create_vt = $('#storeCreateForm').validate({
             rules: {
-                channel_name: {
-                    required: true,
-                    maxlength: 256
-                },
                 phone_num: {
                     required: true,
                     isMobile: '#phone_num'
@@ -214,10 +210,6 @@ $(document).ready(function(){
                 }
             },
             messages: {
-                channel_name: {
-                    required: '请选择渠道名称',
-                    maxlength: $.validator.format("请输入一个 长度最多是 {0} 的字符串")
-                },
                 phone_num: {
                     required: '请输入手机号'
                 },
@@ -291,10 +283,8 @@ $(document).ready(function(){
 		var divide_percent= $('#divide_percent').val();
 		var business = $('#business').val();
 		var front_business = $('#front_business').val();
-		var channel_val = $('.c_channel_name').val();
 
-		channel_id = channel_val.split('|')[0];
-		is_prepayment = channel_val.split('|')[1];
+		is_prepayment = window.localStorage.getItem('is_prepayment');
 
         post_data['se_userid'] = se_userid;
 		post_data['login_name'] = login_name;
@@ -317,7 +307,6 @@ $(document).ready(function(){
 		post_data['training_amt_per'] = training_amt_per;
 		post_data['business'] = business;
 		post_data['front_business'] = front_business;
-		post_data['channel_id'] = channel_id;
 
         if(is_prepayment == 1){
             if(!divide_percent){
@@ -329,7 +318,7 @@ $(document).ready(function(){
 
 
         $.ajax({
-	        url: '/channel_op/v1/api/store_create',
+	        url: '/channel/v1/api/store_create',
 	        type: 'POST',
 	        dataType: 'json',
 	        data: post_data,
@@ -366,7 +355,7 @@ $(document).ready(function(){
             'se_userid': se_userid
         };
         $.ajax({
-	        url: '/channel_op/v1/api/store_set_state',
+	        url: '/channel/v1/api/store_set_state',
 	        type: 'POST',
 	        dataType: 'json',
 	        data: post_data,
@@ -401,7 +390,7 @@ $(document).ready(function(){
             'se_userid': se_userid
         };
         $.ajax({
-	        url: '/channel_op/v1/api/store',
+	        url: '/channel/v1/api/store',
 	        type: 'GET',
 	        dataType: 'json',
 	        data: get_data,
@@ -479,7 +468,7 @@ $(document).ready(function(){
         };
 
         $.ajax({
-	        url: '/channel_op/v1/api/eyesight_info',
+	        url: '/channel/v1/api/eyesight_info',
 	        type: 'GET',
 	        dataType: 'json',
 	        data: get_data,
@@ -689,7 +678,7 @@ $(document).ready(function(){
         }
 
         $.ajax({
-	        url: '/channel_op/v1/api/store',
+	        url: '/channel/v1/api/store',
 	        type: 'POST',
 	        dataType: 'json',
 	        data: post_data,
@@ -726,7 +715,7 @@ $(document).ready(function(){
         post_data['channel_id'] = channel_id;
 
         $.ajax({
-	        url: '/channel_op/v1/api/eyesight_info',
+	        url: '/channel/v1/api/eyesight_info',
 	        type: 'POST',
 	        dataType: 'json',
 	        data: post_data,
@@ -760,7 +749,7 @@ $(document).ready(function(){
             'se_userid': se_userid
         };
         $.ajax({
-	        url: '/channel_op/v1/api/store_eye',
+	        url: '/channel/v1/api/store_eye',
 	        type: 'GET',
 	        dataType: 'json',
 	        data: get_data,
@@ -809,7 +798,7 @@ $(document).ready(function(){
             return false;
         }
         $.ajax({
-	        url: '/channel_op/v1/api/store_eye',
+	        url: '/channel/v1/api/store_eye',
 	        type: 'POST',
 	        dataType: 'json',
 	        data: post_data,
