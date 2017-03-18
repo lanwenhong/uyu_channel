@@ -10,6 +10,7 @@ from uyubase.uyu.define import UYU_USER_ROLE_SUPER, UYU_USER_STATE_OK, UYU_SYS_R
 from uyubase.base.training_op import TrainingOP
 from uyubase.uyu.define import UYU_OP_CATEGORY_MAP, UYU_ORDER_TYPE_MAP, UYU_ORDER_STATUS_MAP, UYU_BUSICD_MAP, UYU_TRAIN_USE_MAP
 from uyubase.uyu import define
+from uyubase.base.uyu_user import UUser
 
 from runtime import g_rt
 from config import cookie_conf
@@ -34,9 +35,6 @@ class TrainBuyInfoHandler(core.Handler):
     _get_handler_fields = [
         Field('page', T_INT, False),
         Field('maxnum', T_INT, False),
-        Field('channel_name', T_STR, True),
-        Field('store_name', T_STR, True),
-        Field('mobile', T_STR, True),
     ]
 
 
@@ -44,19 +42,23 @@ class TrainBuyInfoHandler(core.Handler):
         return error(UAURET.PARAMERR, respmsg=msg)
 
 
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self, *args):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         try:
             data = {}
             params = self.validator.data
             curr_page = params.get('page')
             max_page_num = params.get('maxnum')
-            channel_name = params.get('channel_name', None)
-            store_name = params.get('store_name', None)
-            phone_num = params.get('phone_num', None)
+
+            uop = UUser()
+            uop.call('load_info_by_userid', self.user.userid)
+            self.channel_id = uop.cdata['chnid']
 
             start, end = tools.gen_ret_range(curr_page, max_page_num)
-            info_data = self._query_handler(channel_name, store_name, phone_num)
+            info_data = self._query_handler()
 
             data['info'] = self._trans_record(info_data[start:end])
             data['num'] = len(info_data)
@@ -68,29 +70,8 @@ class TrainBuyInfoHandler(core.Handler):
 
 
     @with_database('uyu_core')
-    def _query_handler(self, channel_name=None, store_name=None, phone_num=None):
-        where = {}
-
-        if channel_name:
-            channel_list = tools.channel_name_to_id(channel_name)
-            if channel_list:
-                where.update({'channel_id': ('in', channel_list)})
-            else:
-                return []
-
-        if store_name:
-            store_list = tools.store_name_to_id(store_name)
-            if store_list:
-                where.update({'store_id': ('in', store_list)})
-            else:
-                return []
-
-        if phone_num:
-            consumer_list = tools.mobile_to_id(phone_num)
-            if consumer_list:
-                where.update({'consumer_id': ('in', consumer_list)})
-            else:
-                return []
+    def _query_handler(self):
+        where = {'channel_id': self.channel_id}
 
         other = ' order by create_time desc'
 

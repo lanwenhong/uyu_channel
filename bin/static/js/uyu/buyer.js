@@ -59,6 +59,9 @@ $(document).ready(function(){
 	           'maxnum': data.length
             };
 
+            var se_userid = window.localStorage.getItem('myid');
+            get_data.se_userid = se_userid;
+
             $.ajax({
 	            url: '/channel/v1/api/training_op_list',
 	            type: 'GET',
