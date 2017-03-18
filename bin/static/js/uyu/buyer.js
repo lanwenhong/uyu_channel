@@ -160,5 +160,9 @@ $(document).ready(function(){
             }
         });
     });
+    
+    $("#training_allocate").click(function () {
+        $("#trainAllocateCreateModal").modal();
+    })
 
 });
