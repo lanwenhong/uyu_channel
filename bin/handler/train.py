@@ -6,7 +6,7 @@ from zbase.web.validator import with_validator_self, Field, T_REG, T_INT, T_STR,
 from zbase.base.dbpool import with_database
 from uyubase.base.response import success, error, UAURET
 from uyubase.base.usession import uyu_check_session, uyu_check_session_for_page
-from uyubase.uyu.define import UYU_USER_ROLE_SUPER, UYU_USER_STATE_OK, UYU_SYS_ROLE_OP, UYU_OP_ERR, UYU_OP_OK
+from uyubase.uyu.define import UYU_USER_ROLE_SUPER, UYU_USER_STATE_OK, UYU_SYS_ROLE_CHAN, UYU_OP_ERR, UYU_OP_OK
 from uyubase.base.training_op import TrainingOP
 from uyubase.uyu.define import UYU_OP_CATEGORY_MAP, UYU_ORDER_TYPE_MAP, UYU_ORDER_STATUS_MAP, UYU_BUSICD_MAP, UYU_TRAIN_USE_MAP
 from uyubase.uyu import define
@@ -19,12 +19,12 @@ log = logging.getLogger()
 
 
 class TrainBuyerManage(core.Handler):
-    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     def GET(self):
         self.write(template.render('buyer.html'))
 
 class TrainUseManage(core.Handler):
-    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session_for_page(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     def GET(self):
         self.write(template.render('use.html'))
 
@@ -298,7 +298,7 @@ class OrgAllotToChanOrderHandler(core.Handler):
 
         return UYU_OP_OK
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         params = self.validator.data
@@ -355,7 +355,7 @@ class OrgAllotToStoreOrderHandler(core.Handler):
         return UYU_OP_OK
 
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         params = self.validator.data
@@ -387,7 +387,7 @@ class OrderCancelHandler(core.Handler):
         Field("order_no", T_STR, False, match=r'^([0-9]{33})$'),
     ]
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         params = self.validator.data
