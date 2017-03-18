@@ -64,6 +64,8 @@ class StoreInfoHandler(core.Handler):
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self, *args):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         try:
             data = {}
             params = self.validator.data
@@ -74,7 +76,6 @@ class StoreInfoHandler(core.Handler):
 
             uop = UUser()
             uop.call('load_info_by_userid', self.user.userid)
-            print '------', uop.cdata
             self.channel_id = uop.cdata['chnid']
 
             start, end = tools.gen_ret_range(curr_page, max_page_num)
@@ -90,9 +91,12 @@ class StoreInfoHandler(core.Handler):
 
     @with_database('uyu_core')
     def _query_handler(self, channel_name=None, store_name=None):
+
         where = {'channel_id': self.channel_id}
+
         if channel_name:
             where.update({'channel_name': channel_name})
+
         if store_name:
             where.update({'store_name': store_name})
 
@@ -356,8 +360,15 @@ class StoreNameListHandler(core.Handler):
     @with_database('uyu_core')
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     def GET(self):
-        sql = "select store_name from stores"
-        db_ret = self.db.query(sql)
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
+
+        uop = UUser()
+        uop.call('load_info_by_userid', self.user.userid)
+        self.channel_id = uop.cdata['chnid']
+
+        db_ret = self.db.select(
+            table='stores', fields='store_name', where={'channel_id': self.channel_id})
 
         ret_list = []
         for item in db_ret:

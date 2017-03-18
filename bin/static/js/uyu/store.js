@@ -48,14 +48,15 @@ $(document).ready(function(){
 	           'page': Math.ceil(data.start / data.length) + 1,
 	           'maxnum': data.length
             };
-            var channel_name = $("#channel_name").val();
+
+            var se_userid = window.localStorage.getItem('myid');
+            get_data.se_userid = se_userid;
+
             var store_name = $("#store_name").val();
-            if(channel_name!=''&&channel_name!=undefined){
-                get_data.channel_name = channel_name;
-            }
             if(store_name!=''&&store_name!=undefined){
                 get_data.store_name = store_name;
             }
+
             $.ajax({
 	            url: '/channel/v1/api/storeinfo_pagelist',
 	            type: 'GET',
@@ -137,10 +138,12 @@ $(document).ready(function(){
     });
 
     $("#storeCreate").click(function(){
+        var se_userid = window.localStorage.getItem('myid');
+        var is_prepayment = window.localStorage.getItem('is_prepayment');
+        if(is_prepayment == 0){
+        }
         $("#storeCreateForm").resetForm();
-        $("#c_channel_name").html('');
         $("label.error").remove();
-        channel_name_select();
         $("#storeCreateModal").modal();
     });
 
@@ -336,7 +339,6 @@ $(document).ready(function(){
                 }
                 else {
                     toastr.success('新建成功');
-                    search_source();
                     $("#storeCreateForm").resetForm();
                     $("#storeCreateModal").modal('hide');
                     $('#storeList').DataTable().draw();
@@ -845,32 +847,7 @@ function search_source() {
     var se_userid = window.localStorage.getItem('myid');
     get_data['se_userid'] = se_userid;
     $.ajax({
-        url: '/channel_op/v1/api/chan_name_list',
-        type: 'GET',
-        data: get_data,
-        dataType: 'json',
-        success: function(data) {
-            var respcd = data.respcd;
-            if(respcd != '0000'){
-                var resperr = data.resperr;
-                var respmsg = data.respmsg;
-                var msg = resperr ? resperr : respmsg;
-                toastr.warning(msg);
-            }
-            else {
-                var subjects = new Array();
-                for(var i=0; i<data.data.length; i++){
-                    subjects.push(data.data[i].channel_name)
-                }
-                $('#channel_name').typeahead({source: subjects});
-            }
-        },
-        error: function(data) {
-            toastr.warning('请求异常');
-        }
-    });
-    $.ajax({
-        url: '/channel_op/v1/api/store_name_list',
+        url: '/channel/v1/api/store_name_list',
         type: 'GET',
         data: get_data,
         dataType: 'json',
@@ -884,48 +861,6 @@ function search_source() {
             }
             else {
                 $('#store_name').typeahead({source: data.data});
-            }
-        },
-        error: function(data) {
-            toastr.warning('请求异常');
-        }
-    });
-}
-
-function channel_name_select() {
-    var get_data = {};
-    var se_userid = window.localStorage.getItem('myid');
-    get_data['se_userid'] = se_userid;
-    $.ajax({
-        url: '/channel_op/v1/api/chan_name_list',
-        type: 'GET',
-        data: get_data,
-        dataType: 'json',
-        success: function(data) {
-            var respcd = data.respcd;
-            if(respcd != '0000'){
-                var resperr = data.resperr;
-                var respmsg = data.respmsg;
-                var msg = resperr ? resperr : respmsg;
-                toastr.warning(msg);
-            }
-            else {
-                var c_channel_name = $('.c_channel_name');
-                for(var i=0; i<data.data.length; i++){
-                    var channel_id = data.data[i].channel_id;
-                    var channel_name = data.data[i].channel_name;
-                    var is_prepayment = data.data[i].is_prepayment;
-                    channel_id = channel_id + '|' + is_prepayment;
-                    var option_str = $('<option value='+channel_id+'>'+channel_name+'</option>');
-                    option_str.appendTo(c_channel_name);
-                    if(i==0){
-                        if(is_prepayment == 0){
-                            $('#create_store_divide_percent').hide();
-                        } else {
-                            $('#create_store_divide_percent').show();
-                        }
-                    }
-                }
             }
         },
         error: function(data) {

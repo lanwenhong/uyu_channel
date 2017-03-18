@@ -22,7 +22,9 @@ $(document).ready(function(){
                         return false;
                     } else {
                         var userid = data.data.userid;
+                        var is_prepayment = data.data.is_prepayment;
                         window.localStorage.setItem('myid', userid);
+                        window.localStorage.setItem('is_prepayment', is_prepayment);
                         window.location.href="/channel/v1/page/overview.html";
 					}
 	            },
