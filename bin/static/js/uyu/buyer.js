@@ -134,7 +134,38 @@ $(document).ready(function(){
 
     $("#training_buyer").click(function(){
         $("#trainBuyerCreateForm").resetForm();
-        $("#trainBuyerCreateModal").modal();
+        var get_data = {};
+        var se_userid = window.localStorage.getItem('myid');
+        get_data.se_userid = se_userid;
+        get_data.userid = se_userid;
+        $.ajax({
+            url: '/channel/v1/api/channel',
+            type: 'GET',
+            dataType: 'json',
+            data: get_data,
+            success: function(data) {
+                var respcd = data.respcd;
+                if(respcd != '0000'){
+                    var resperr = data.resperr;
+                    var respmsg = data.respmsg;
+                    var msg = resperr ? resperr : respmsg;
+                    toastr.warning(msg);
+                    return false;
+                }
+                else {
+                    var ch_data = data.data.chn_data;
+                    var training_amt_per = ch_data.training_amt_per;
+                    var channel_id = ch_data.chnid;
+                    $("#chnid").text(channel_id);
+                    $("#channel_training_amt_per").val(training_amt_per);
+                    $("#trainBuyerCreateModal").modal();
+                }
+            },
+            error: function(data) {
+                toastr.warning('请求异常');
+                return false;
+            }
+        });
     });
 
     $("#trainBuyerSearch").click(function(){
@@ -142,15 +173,20 @@ $(document).ready(function(){
     });
 
     $("#trainBuyerCreateSubmit").click(function(){
-        var post_url = '';
+        var post_url = '/channel/v1/api/channel_buy_order';
         var post_data = {};
         var se_userid = window.localStorage.getItem('myid');
         post_data.se_userid = se_userid;
         var training_times = $('#training_times').val();
         var training_amt = $('#training_amt').val() * 100;
+        var channel_id = $("#chnid").text();
+        var ch_training_amt_per = $("#channel_training_amt_per").val();
 
+        post_data.busicd = "CHAN_BUY";
+        post_data.channel_id = channel_id;
         post_data.training_times = training_times;
         post_data.training_amt = parseInt(training_amt.toFixed(2));
+        post_data.ch_training_amt_per = ch_training_amt_per;
 
         $.ajax({
             url: post_url,

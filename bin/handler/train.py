@@ -246,27 +246,56 @@ class TrainUseInfoHandler(core.Handler):
             return error(UAURET.SERVERERR)
 
 #渠道系统用
-#class ChanBuyTrainingsOrderHandler(core.Handler):
-#    _post_handler_fields = [
-#        Field("busicd", T_STR, False, match=r'^([0-9]{6})$'),
-#        Field('channel_id', T_STR, False),
-#        Field('training_times', T_INT, False),
-#        Field('training_amt', T_INT, False),
-#        Field('ch_training_amt_per', T_INT, False),
-#    ]
-#
-#    @with_validator_self
-#    def _post_handler(self):
-#        params = self.validator.data
-#        log.debug("client data: %s", params)
-#        top = TrainingOP(params)
-#        ret = top.create_chan_buy_trainings_order()
-#        if ret == UYU_OP_ERR:
-#            return error(UAURET.ORDERERR)
-#        return success({})
-#
-#    def POST(self):
-#        return self._post_handler()
+
+class ChanBuyTrainingsOrderHandler(core.Handler):
+    _post_handler_fields = [
+        Field("busicd", T_STR, False, match=r'^([0-9]{6})$'),
+        Field('channel_id', T_STR, False),
+        Field('training_times', T_INT, False),
+        Field('training_amt', T_INT, False),
+        Field('ch_training_amt_per', T_INT, False),
+    ]
+
+    @with_database('uyu_core')
+    def _check_permission(self, params):
+        channel_id = params["channel_id"]
+        channel_reocord = self.db.select_one("channel", {"id": channel_id})
+        training_amt = params["training_amt"]
+        training_times = params["training_times"]
+        ch_training_amt_per = params["training_amt_per"]
+
+        is_valid = channel_reocord["is_valid"]
+
+        if is_valid == define.UYU_CHAN_STATUS_CLOSE:
+            return UYU_OP_ERR
+
+        if ch_training_amt_per != channel_reocord["training_amt_per"] or training_amt != training_times * ch_training_amt_per:
+            return UYU_OP_ERR
+
+        return UYU_OP_OK
+
+    @with_validator_self
+    def _post_handler(self):
+        params = self.validator.data
+        log.debug("client data: %s", params)
+
+        if params["busicd"] != define.BUSICD_CHAN_BUY_TRAING_TIMES:
+            log.warn('client busicd: %s real busicd: %s', params['busicd'], define.BUSICD_CHAN_BUY_TRAING_TIMES)
+            return error(UAURET.BUSICEERR)
+
+        if self._check_permission(params) == UYU_OP_ERR:
+            return error(UAURET.ORDERERR)
+
+        self.user.load_user()
+        top = TrainingOP(params, self.user.udata)
+        ret = top.create_chan_buy_trainings_order()
+        if ret == UYU_OP_ERR:
+            return error(UAURET.ORDERERR)
+        return success({})
+
+    def POST(self):
+        return self._post_handler()
+
 
 class OrgAllotToChanOrderHandler(core.Handler):
     _post_handler_fields = [
