@@ -62,6 +62,19 @@ $(document).ready(function(){
             var se_userid = window.localStorage.getItem('myid');
             get_data.se_userid = se_userid;
 
+            var op_type = $("#s_op_type").val();
+            if(op_type!=-1){
+                get_data.op_type = op_type;
+            }
+
+            var start_time = $("#start_time").val();
+            var end_time = $("#end_time").val();
+
+            if(start_time && end_time){
+                get_data.start_time = start_time;
+                get_data.end_time = end_time;
+            }
+
             $.ajax({
 	            url: '/channel/v1/api/training_op_list',
 	            type: 'GET',

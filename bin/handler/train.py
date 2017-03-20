@@ -35,6 +35,9 @@ class TrainBuyInfoHandler(core.Handler):
     _get_handler_fields = [
         Field('page', T_INT, False),
         Field('maxnum', T_INT, False),
+        Field('op_type', T_INT, True, match=r'^([0-1]{1})$'),
+        Field('start_time', T_STR, True),
+        Field('end_time', T_STR, True),
     ]
 
 
@@ -52,13 +55,16 @@ class TrainBuyInfoHandler(core.Handler):
             params = self.validator.data
             curr_page = params.get('page')
             max_page_num = params.get('maxnum')
+            op_type = params.get('op_type', None)
+            start_time = params.get('start_time', None)
+            end_time = params.get('end_time', None)
 
             uop = UUser()
             uop.call('load_info_by_userid', self.user.userid)
             self.channel_id = uop.cdata['chnid']
 
             start, end = tools.gen_ret_range(curr_page, max_page_num)
-            info_data = self._query_handler()
+            info_data = self._query_handler(op_type, start_time, end_time)
 
             data['info'] = self._trans_record(info_data[start:end])
             data['num'] = len(info_data)
@@ -70,8 +76,16 @@ class TrainBuyInfoHandler(core.Handler):
 
 
     @with_database('uyu_core')
-    def _query_handler(self):
+    def _query_handler(self, op_type=None, start_time=None, end_time=None):
         where = {'channel_id': self.channel_id}
+
+        if start_time and end_time:
+            start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d')
+            end_time = datetime.datetime.strptime(end_time, '%Y-%m-%d').replace(hour=23, minute=59, second=59)
+            where.update({'create_time': ('between', [start_time, end_time])})
+
+        if op_type in (0, 1):
+            where.update({'op_type': op_type})
 
         other = ' order by create_time desc'
 
