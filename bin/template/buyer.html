@@ -25,11 +25,12 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-					剩余可用次数：<span id="t_training_times">0</span>
+                    训练分配
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
 					<div class="row">
+
 						<form class="form-inline">
 							<div class="form-group">
 							  	<label for="s_op_type">操作类型</label>
@@ -40,19 +41,32 @@
 								</select>
 							</div>
 
-							<div class="form-group">
-								<label for="start_time">购买时间</label>
-								<div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="start_time" data-link-format="yyyy-mm-dd">
-									<input class="form-control" type="text" value="" readonly="">
-									<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-									<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-								</div>
-								<input type="hidden" id="start_time" value=""><br>
-							</div>
+                            <div class="datetimepicker-container">
+                                <span>时间</span>
+                                <div class="form-group">
+                                    <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="start_time" data-link-format="yyyy-mm-dd">
+                                        <input class="form-control" type="text" value="" readonly="">
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                    <input type="hidden" id="start_time" value=""><br>
+                                </div>
+                                <span> - </span>
+                                <div class="form-group">
+                                    <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="end_time" data-link-format="yyyy-mm-dd">
+                                        <input class="form-control" type="text" value="" readonly="">
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                    <input type="hidden" id="end_time" value=""><br>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary" id="trainBuyerSearch">搜索</button>
+                                    <button type="button" class="btn btn-default" id="training_buyer">购买</button>
+                                    <button type="button" class="btn btn-default" id="training_allocate">分配</button>
+                                </div>
+                            </div>
 
-							<button type="button" class="btn btn-primary" id="trainBuyerSearch">搜索</button>
-							<button type="button" class="btn btn-default" id="training_buyer">购买</button>
-							<button type="button" class="btn btn-default" id="training_allocate">分配</button>
 						</form>
 					</div>
 
