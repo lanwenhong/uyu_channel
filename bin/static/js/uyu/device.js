@@ -345,6 +345,8 @@ function do_first_select(store_name_tag_id) {
             }
             else {
                 var c_store_name = $(store_name_tag_id);
+                var first_str = $('<option value="">'+'无'+'</option>');
+                first_str.appendTo(c_store_name);
                 for(var i=0; i<data.data.length; i++){
                     var store_id = data.data[i].id;
                     var store_name = data.data[i].store_name;
