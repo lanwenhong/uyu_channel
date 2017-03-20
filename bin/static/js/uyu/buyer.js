@@ -91,14 +91,18 @@ $(document).ready(function(){
             });
         },
 		'columns': [
-				{ data: 'id' },
-                { data: 'category' },
-                { data: 'op_type' },
-                { data: 'store_name' },
-                { data: 'create_time' },
-				{ data: 'training_times' },
-				{ data: 'training_amt' },
-				{ data: 'status' }
+            { data: 'buyer' },
+            { data: 'seller' },
+            { data: 'category' },
+            { data: 'op_type' },
+            { data: 'orderno' },
+            { data: 'training_times' },
+            { data: 'training_amt' },
+            { data: 'op_name' },
+            { data: 'status' },
+            { data: 'create_time' },
+            { data: 'update_time' },
+            { data: 'remark' }
 		],
         'oLanguage': {
             'sProcessing': '<span style="color:red;">加载中....</span>',
