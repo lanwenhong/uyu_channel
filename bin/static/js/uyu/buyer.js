@@ -10,15 +10,7 @@ $(document).ready(function(){
 
     $("#training_times").bind('input propertychange', function () {
         var amount_per = 0;
-        var order_type = $('.c_busicd').val();
-        if(order_type == 'ORG_ALLOT_TO_CHAN') {
-            amount_per = $('.c_channel_name').val().split('|')[1];
-            amount_per = (amount_per / 100).toFixed(2);
-        }
-        else {
-            amount_per = $('.c_store_name').val().split('|')[1];
-            amount_per = (amount_per / 100).toFixed(2);
-        }
+        amount_per = $('#channel_training_amt_per').val();
         $('#training_amt').val(($(this).val() * amount_per).toFixed(2));
     });
 
@@ -155,6 +147,7 @@ $(document).ready(function(){
                 else {
                     var ch_data = data.data.chn_data;
                     var training_amt_per = ch_data.training_amt_per;
+                    training_amt_per = (training_amt_per / 100).toFixed(2);
                     var channel_id = ch_data.chnid;
                     $("#chnid").text(channel_id);
                     $("#channel_training_amt_per").val(training_amt_per);
@@ -186,7 +179,7 @@ $(document).ready(function(){
         post_data.channel_id = channel_id;
         post_data.training_times = training_times;
         post_data.training_amt = parseInt(training_amt.toFixed(2));
-        post_data.ch_training_amt_per = ch_training_amt_per;
+        post_data.ch_training_amt_per = parseInt((ch_training_amt_per * 100).toFixed(2));
 
         $.ajax({
             url: post_url,
@@ -213,7 +206,7 @@ $(document).ready(function(){
             }
         });
     });
-    
+
     $("#training_allocate").click(function () {
         $("#trainAllocateCreateModal").modal();
     })

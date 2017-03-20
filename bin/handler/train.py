@@ -262,7 +262,7 @@ class ChanBuyTrainingsOrderHandler(core.Handler):
         channel_reocord = self.db.select_one("channel", {"id": channel_id})
         training_amt = params["training_amt"]
         training_times = params["training_times"]
-        ch_training_amt_per = params["training_amt_per"]
+        ch_training_amt_per = params["ch_training_amt_per"]
 
         is_valid = channel_reocord["is_valid"]
 
@@ -274,6 +274,7 @@ class ChanBuyTrainingsOrderHandler(core.Handler):
 
         return UYU_OP_OK
 
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         params = self.validator.data
