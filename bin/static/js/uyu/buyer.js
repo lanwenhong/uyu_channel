@@ -14,6 +14,11 @@ $(document).ready(function(){
         $('#training_amt').val(($(this).val() * amount_per).toFixed(2));
     });
 
+    $("#a_training_times").bind('input propertychange', function () {
+        var amount_per = $('#a_store_training_amt_per').val();
+        $('#a_training_amt').val(($(this).val() * amount_per).toFixed(2));
+    });
+
     $.validator.addMethod("isYuan", function(value, element) {
         var length = value.length;
         var yuan  = /^([0-9]{1,6})\.([0-9]{1,2})$/;
@@ -208,7 +213,50 @@ $(document).ready(function(){
     });
 
     $("#training_allocate").click(function () {
-        $("#trainAllocateCreateModal").modal();
+        $.ajax({
+            url: '/channel/v1/api/chan_store_list',
+            type: 'GET',
+            dataType: 'json',
+            data: get_data,
+            success: function(data) {
+                var respcd = data.respcd;
+                if(respcd != '0000'){
+                    var resperr = data.resperr;
+                    var respmsg = data.respmsg;
+                    var msg = resperr ? resperr : respmsg;
+                    toastr.warning(msg);
+                    return false;
+                }
+                else {
+                    var c_store_name = $("#store_name");
+                    for(var i=0; i<data.data.length; i++){
+                        var store_id = data.data[i].id;
+                        var store_name = data.data[i].store_name;
+                        var training_amt_per = data.data[i].training_amt_per;
+                        store_id = store_id+'|'+training_amt_per;
+                        var option_str = $('<option value='+store_id+'>'+store_name+'</option>');
+                        option_str.appendTo(c_store_name);
+                        if(i==0){
+                            var st_training_amt_per = (training_amt_per / 100).toFixed(2);
+                            $("#a_store_training_amt_per").val(st_training_amt_per);
+                        }
+                    }
+                    $("#trainAllocateCreateModal").modal();
+                }
+            },
+            error: function(data) {
+                toastr.warning('请求异常');
+                return false;
+            }
+        });
+
+    });
+    
+    $("#store_name").change(function () {
+        var st_val = $("#store_name").val();
+        var st_training_amt_per = st_val.split('|')[1];
+        st_training_amt_per = (st_training_amt_per / 100).toFixed(2);
+        $("#a_store_training_amt_per").val(st_training_amt_per);
     })
 
 });
