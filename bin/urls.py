@@ -53,8 +53,7 @@ urls = (
     ('^/channel/v1/api/eyesight_info$', eyesight.EyeSightInfoHandler),
 
     #训练订单
-    # ('^/channel/v1/api/org_allot_to_chan_order$', train.OrgAllotToChanOrderHandler),
-    # ('^/channel/v1/api/org_allot_to_store_order$', train.OrgAllotToStoreOrderHandler),
+    ('^/channel/v1/api/channel_allot_to_store_order$', train.ChannelAllotToStoreOrderHandler),
     ('^/channel/v1/api/order_cancel$', train.OrderCancelHandler),
 
     ('^/channel/v1/api/channel_buy_order$', train.ChanBuyTrainingsOrderHandler),

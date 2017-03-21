@@ -248,6 +248,7 @@ class TrainUseInfoHandler(core.Handler):
 #渠道系统用
 
 class ChanBuyTrainingsOrderHandler(core.Handler):
+    """渠道向公司购买"""
     _post_handler_fields = [
         Field("busicd", T_STR, False, match=r'^([0-9]{6})$'),
         Field('channel_id', T_STR, False),
@@ -347,13 +348,12 @@ class OrgAllotToChanOrderHandler(core.Handler):
 
 #FIMME
 #是否是公司帮渠道分配
-class OrgAllotToStoreOrderHandler(core.Handler):
+class ChannelAllotToStoreOrderHandler(core.Handler):
     _post_handler_fields = [
         Field("busicd", T_STR, False, match=r'^([0-9]{6})$'),
-        Field('channel_id', T_INT, False),
+        # Field('channel_id', T_INT, False),
         Field('store_id', T_INT, False),
         Field('training_times', T_INT, False),
-        # Field('training_amt', T_INT, False),
         Field('training_amt', T_FLOAT, False),
         Field('store_training_amt_per', T_INT, False),
     ]
@@ -361,7 +361,9 @@ class OrgAllotToStoreOrderHandler(core.Handler):
     @with_database('uyu_core')
     def _check_permission(self, params):
         store_id = params["store_id"]
-        chan_id = params["channel_id"]
+        chan_id = self.channel_id
+        params["channel_id"] = chan_id
+
         store_record = self.db.select_one("stores", {"id": store_id})
         chan_record = self.db.select_one("channel", {"id": chan_id})
 
@@ -387,6 +389,11 @@ class OrgAllotToStoreOrderHandler(core.Handler):
     def _post_handler(self):
         params = self.validator.data
         log.debug("client data: %s", params)
+
+        uop = UUser()
+        uop.call('load_info_by_userid', self.user.userid)
+        self.channel_id = uop.cdata['chnid']
+
         if params["busicd"] != define.BUSICD_CHAN_ALLOT_TO_STORE:
             return error(UAURET.BUSICEERR)
 

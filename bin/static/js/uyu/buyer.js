@@ -213,6 +213,13 @@ $(document).ready(function(){
     });
 
     $("#training_allocate").click(function () {
+
+        $("#trainAllocateCreateForm").resetForm();
+
+        var get_data = {};
+        var se_userid = window.localStorage.getItem('myid');
+        get_data.se_userid = se_userid;
+
         $.ajax({
             url: '/channel/v1/api/chan_store_list',
             type: 'GET',
@@ -251,7 +258,7 @@ $(document).ready(function(){
         });
 
     });
-    
+
     $("#store_name").change(function () {
         var st_val = $("#store_name").val();
         var st_training_amt_per = st_val.split('|')[1];
@@ -259,4 +266,47 @@ $(document).ready(function(){
         $("#a_store_training_amt_per").val(st_training_amt_per);
     })
 
+
+    $("#trainAllocateCreateSubmit").click(function(){
+        var post_data = {};
+        var se_userid = window.localStorage.getItem('myid');
+        post_data.se_userid = se_userid;
+        var st_val = $("#store_name").val();
+        var store_id = st_val.split('|')[0];
+        var st_training_amt_per = st_val.split('|')[1];
+        var training_times = $("#a_training_times").val();
+        var training_amt = $("#a_training_amt").val();
+        var remark = $("#remark").val();
+
+        post_data.store_id = store_id;
+        post_data.store_training_amt_per = st_training_amt_per;
+        post_data.training_times = training_times;
+        post_data.training_amt = training_amt * 100;
+        post_data.remark = remark;
+        post_data.busicd = "CHAN_ALLOT_TO_STORE";
+
+        $.ajax({
+            url: '/channel/v1/api/channel_allot_to_store_order',
+            type: 'POST',
+            dataType: 'json',
+            data: post_data,
+            success: function(data){
+                var respcd = data.respcd;
+                if(respcd != '0000'){
+                    var resperr = data.resperr;
+                    var respmsg = data.respmsg;
+                    var msg = resperr ? resperr : respmsg;
+                    toastr.warning(msg);
+                }
+                else {
+                    toastr.success('分配成功');
+                    $("#trainAllocateCreateModal").modal('hide');
+                    $('#trainBuyerList').DataTable().draw();
+                }
+            },
+            error: function(data){
+            }
+        });
+
+    });
 });
