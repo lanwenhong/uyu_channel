@@ -272,6 +272,8 @@ class ChanBuyTrainingsOrderHandler(core.Handler):
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         params = self.validator.data
         log.debug("client data: %s", params)
 
@@ -323,6 +325,8 @@ class OrgAllotToChanOrderHandler(core.Handler):
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         params = self.validator.data
         log.debug("client data: %s", params)
         if params["busicd"] != define.BUSICD_ORG_ALLOT_TO_CHAN:
@@ -382,6 +386,8 @@ class ChannelAllotToStoreOrderHandler(core.Handler):
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         params = self.validator.data
         log.debug("client data: %s", params)
 
@@ -419,6 +425,8 @@ class OrderCancelHandler(core.Handler):
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         params = self.validator.data
         order_no = params["order_no"]
         log.debug("order_no: %s", order_no)

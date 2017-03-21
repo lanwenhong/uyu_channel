@@ -157,8 +157,11 @@ class ChannelInfoHandler(core.Handler):
     def _get_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
 
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self, *args):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         try:
             data = {}
             params = self.validator.data
@@ -321,11 +324,12 @@ class ChanStoreMap(core.Handler):
 
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     def _get_handler(self, *args):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         try:
             uop = UUser()
             uop.call('load_info_by_userid', self.user.userid)
             channel_id = uop.cdata['chnid']
-            print '------', channel_id
             data = self._query_handler(channel_id)
             return success(data)
         except Exception as e:

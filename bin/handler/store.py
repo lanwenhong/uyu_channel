@@ -253,6 +253,8 @@ class StoreEyeHandler(core.Handler):
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         params = self.validator.data
         uop = UUser()
         uop.call("load_user_by_mobile", params["phone_num"])
