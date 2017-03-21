@@ -301,7 +301,7 @@ $(document).ready(function(){
         post_data.se_userid = se_userid;
         post_data.order_no = orderno;
         $.ajax({
-            url: '/channel_op/v1/api/order_cancel',
+            url: '/channel/v1/api/order_cancel',
             type: 'POST',
             data: post_data,
             dataType: 'json',

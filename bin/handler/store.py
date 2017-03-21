@@ -357,8 +357,9 @@ class CreateStoreHandler(core.Handler):
 
 class StoreNameListHandler(core.Handler):
 
-    @with_database('uyu_core')
+
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
+    @with_database('uyu_core')
     def GET(self):
         if not self.user.sauth:
             return error(UAURET.SESSIONERR)

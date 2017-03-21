@@ -138,9 +138,8 @@ class TrainUseInfoHandler(core.Handler):
     _get_handler_fields = [
         Field('page', T_INT, False),
         Field('maxnum', T_INT, False),
-        Field('channel_name', T_STR, True),
         Field('store_name', T_STR, True),
-        Field('consumer_mobile', T_STR, True),
+        Field('consumer_id', T_STR, True),
         Field('eyesight', T_STR, True),
         Field('create_time', T_STR, True),
     ]
@@ -148,21 +147,27 @@ class TrainUseInfoHandler(core.Handler):
     def _get_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
 
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self, *args):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         try:
             data = {}
             params = self.validator.data
             curr_page = params.get('page')
             max_page_num = params.get('maxnum')
-            channel_name = params.get('channel_name')
             store_name = params.get('store_name')
-            consumer_mobile = params.get('consumer_mobile')
+            consumer_id = params.get('consumer_id')
             eyesight = params.get('eyesight')
             create_time = params.get('create_time')
+
+            uop = UUser()
+            uop.call('load_info_by_userid', self.user.userid)
+            self.channel_id = uop.cdata['chnid']
+
             start, end = tools.gen_ret_range(curr_page, max_page_num)
-            info_data = self._query_handler(channel_name, store_name, consumer_mobile, eyesight, create_time)
-            # data['info'] = info_data[start:end]
+            info_data = self._query_handler(store_name, consumer_id, eyesight, create_time)
             data['info'] = self._trans_record(info_data[start:end])
             data['num'] = len(info_data)
             return success(data)
@@ -172,14 +177,8 @@ class TrainUseInfoHandler(core.Handler):
             return error(UAURET.DATAERR)
 
     @with_database('uyu_core')
-    def _query_handler(self, channel_name=None, store_name=None, consumer_mobile=None, eyesight=None, create_time=None):
-        where = {}
-        if channel_name:
-            channel_list = tools.channel_name_to_id(channel_name)
-            if channel_list:
-                where.update({'channel_id': ('in', channel_list)})
-            else:
-                return []
+    def _query_handler(self, store_name=None, consumer_id=None, eyesight=None, create_time=None):
+        where = {'channel_id': self.channel_id}
 
         if store_name:
             store_list = tools.store_name_to_id(store_name)
@@ -188,15 +187,11 @@ class TrainUseInfoHandler(core.Handler):
             else:
                 return []
 
-        if consumer_mobile:
-            consumer_list = tools.mobile_to_id(consumer_mobile)
-            if consumer_list:
-                where.update({'consumer_id': ('in', consumer_list)})
-            else:
-                return []
+        if consumer_id:
+            where.update({'consumer_id': consumer_id})
 
         if eyesight:
-            eyesight_list = tools.mobile_to_id(eyesight)
+            eyesight_list = tools.nickname_to_id(eyesight)
             if eyesight_list:
                 where.update({'eyesight_id': ('in', eyesight_list)})
             else:
@@ -222,14 +217,12 @@ class TrainUseInfoHandler(core.Handler):
             return []
 
         for item in data:
-            channel_ret = self.db.select_one(table='channel', fields='channel_name', where={'id': item['channel_id']})
             store_ret = self.db.select_one(table='stores', fields='store_name', where={'id': item['store_id']})
             device_name = self.db.select_one(table='device', fields='device_name', where={'id': item['device_id']})
-            eyesight_name = self.db.select_one(table='auth_user', fields='username', where={'id': item['eyesight_id']})
-            item['channel_name'] = channel_ret.get('channel_name') if channel_ret else ''
+            eyesight_name = self.db.select_one(table='auth_user', fields='nick_name', where={'id': item['eyesight_id']})
             item['store_name'] = store_ret.get('store_name') if store_ret else ''
             item['device_name'] = device_name.get('device_name') if device_name else ''
-            item['eyesight_name'] = eyesight_name.get('username') if eyesight_name else ''
+            item['eyesight_name'] = eyesight_name.get('nick_name') if eyesight_name else ''
             item['create_time'] = item['ctime'].strftime('%Y-%m-%d %H:%M:%S')
             item['status'] = UYU_TRAIN_USE_MAP.get(item['status'], '')
 

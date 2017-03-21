@@ -31,19 +31,18 @@ $(document).ready(function(){
 	           'page': Math.ceil(data.start / data.length) + 1,
 	           'maxnum': data.length,
             };
-            var channel_name = $("#s_channel_name").val();
-            if(channel_name){
-                get_data.channel_name = channel_name;
-            }
+
+            var se_userid = window.localStorage.getItem('myid');
+            get_data.se_userid = se_userid;
 
             var store_name = $("#s_store_name").val();
             if(store_name){
                 get_data.store_name = store_name;
             }
 
-            var consumer_mobile = $("#s_consumer").val();
-            if(consumer_mobile){
-                get_data.consumer_mobile = consumer_mobile;
+            var consumer_id = $("#s_consumer").val();
+            if(consumer_id){
+                get_data.consumer_id = consumer_id;
             }
 
             var eyesight = $("#s_eyesight").val();
@@ -58,7 +57,7 @@ $(document).ready(function(){
 
 
             $.ajax({
-	            url: '/channel_op/v1/api/training_use_list',
+	            url: '/channel/v1/api/training_use_list',
 	            type: 'GET',
 	            dataType: 'json',
 	            data: get_data,
@@ -90,7 +89,6 @@ $(document).ready(function(){
         },
 		'columns': [
 				{ data: 'id' },
-				{ data: 'channel_name' },
 				{ data: 'store_name' },
 				{ data: 'device_name' },
 				{ data: 'consumer_id' },
@@ -124,33 +122,9 @@ function search_source() {
     var get_data = {};
     var se_userid = window.localStorage.getItem('myid');
     get_data['se_userid'] = se_userid;
+
     $.ajax({
-        url: '/channel_op/v1/api/chan_name_list',
-        type: 'GET',
-        data: get_data,
-        dataType: 'json',
-        success: function(data) {
-            var respcd = data.respcd;
-            if(respcd != '0000'){
-                var resperr = data.resperr;
-                var respmsg = data.respmsg;
-                var msg = resperr ? resperr : respmsg;
-                toastr.warning(msg);
-            }
-            else {
-                var subjects = new Array();
-                for(var i=0; i<data.data.length; i++){
-                    subjects.push(data.data[i].channel_name)
-                }
-                $('#s_channel_name').typeahead({source: subjects});
-            }
-        },
-        error: function(data) {
-            toastr.warning('请求异常');
-        }
-    });
-    $.ajax({
-        url: '/channel_op/v1/api/store_name_list',
+        url: '/channel/v1/api/store_name_list',
         type: 'GET',
         data: get_data,
         dataType: 'json',
