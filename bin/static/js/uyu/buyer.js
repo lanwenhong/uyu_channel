@@ -100,6 +100,28 @@ $(document).ready(function(){
 	            }
             });
         },
+        'columnDefs': [
+            {
+                targets: 12,
+                data: '操作',
+                render: function(data, type, full) {
+                    var orderno = full.orderno;
+                    var is_valid = full.is_valid;
+                    var busicd = full.busicd;
+                    var create_time = full.create_time;
+                    create_time = Date.parse(create_time.replace(/-/g,"/"));
+                    var now = new Date();
+                    var compare_time = new Date(Year=now.getFullYear(), Months=now.getMonth(), Day=now.getDate(), Hours=0, Minutes=0, senconds=0);
+                    if(busicd === "CHAN_ALLOT_TO_STORE" && is_valid === 0 && create_time >= compare_time){
+                        var cancel = '<input type="button" class="btn btn-primary btn-sm order-cancel" data-orderno='+orderno+' value=' + '撤销' + '>';
+                    } else {
+                        var cancel = '<input type="button" class="btn btn-primary btn-sm order-cancel"  disabled data-orderno='+orderno+' value=' + '撤销' + '>';
+                    }
+
+                    return cancel;
+                }
+            }
+        ],
 		'columns': [
             { data: 'buyer' },
             { data: 'seller' },
@@ -266,8 +288,42 @@ $(document).ready(function(){
         $("#a_store_training_amt_per").val(st_training_amt_per);
         $("#a_training_times").val('');
         $("#a_training_amt").val('');
-    })
+    });
 
+    $(document).on('click', '.order-cancel', function(){
+        var orderno = $(this).data('orderno');
+        var se_userid = window.localStorage.getItem('myid');
+        if(!orderno){
+            toastr.warning('请确认订单号');
+            return false;
+        }
+        var post_data = {};
+        post_data.se_userid = se_userid;
+        post_data.order_no = orderno;
+        $.ajax({
+            url: '/channel_op/v1/api/order_cancel',
+            type: 'POST',
+            data: post_data,
+            dataType: 'json',
+            success: function(data) {
+                var respcd = data.respcd;
+                if(respcd != '0000'){
+                    var resperr = data.resperr;
+                    var respmsg = data.respmsg;
+                    var msg = resperr ? resperr : respmsg;
+                    toastr.warning(msg);
+                }
+                else {
+                    toastr.success('撤销成功');
+                    $('#trainBuyerList').DataTable().draw();
+                }
+            },
+            error: function(data) {
+                toastr.warning('请求异常');
+            }
+        });
+
+    });
 
     $("#trainAllocateCreateSubmit").click(function(){
         var post_data = {};
