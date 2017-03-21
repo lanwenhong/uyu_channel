@@ -264,6 +264,8 @@ $(document).ready(function(){
         var st_training_amt_per = st_val.split('|')[1];
         st_training_amt_per = (st_training_amt_per / 100).toFixed(2);
         $("#a_store_training_amt_per").val(st_training_amt_per);
+        $("#a_training_times").val('');
+        $("#a_training_amt").val('');
     })
 
 
