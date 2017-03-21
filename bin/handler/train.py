@@ -138,9 +138,8 @@ class TrainUseInfoHandler(core.Handler):
     _get_handler_fields = [
         Field('page', T_INT, False),
         Field('maxnum', T_INT, False),
-        Field('channel_name', T_STR, True),
         Field('store_name', T_STR, True),
-        Field('consumer_mobile', T_STR, True),
+        Field('consumer_id', T_STR, True),
         Field('eyesight', T_STR, True),
         Field('create_time', T_STR, True),
     ]
@@ -148,21 +147,27 @@ class TrainUseInfoHandler(core.Handler):
     def _get_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
 
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self, *args):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         try:
             data = {}
             params = self.validator.data
             curr_page = params.get('page')
             max_page_num = params.get('maxnum')
-            channel_name = params.get('channel_name')
             store_name = params.get('store_name')
-            consumer_mobile = params.get('consumer_mobile')
+            consumer_id = params.get('consumer_id')
             eyesight = params.get('eyesight')
             create_time = params.get('create_time')
+
+            uop = UUser()
+            uop.call('load_info_by_userid', self.user.userid)
+            self.channel_id = uop.cdata['chnid']
+
             start, end = tools.gen_ret_range(curr_page, max_page_num)
-            info_data = self._query_handler(channel_name, store_name, consumer_mobile, eyesight, create_time)
-            # data['info'] = info_data[start:end]
+            info_data = self._query_handler(store_name, consumer_id, eyesight, create_time)
             data['info'] = self._trans_record(info_data[start:end])
             data['num'] = len(info_data)
             return success(data)
@@ -172,14 +177,8 @@ class TrainUseInfoHandler(core.Handler):
             return error(UAURET.DATAERR)
 
     @with_database('uyu_core')
-    def _query_handler(self, channel_name=None, store_name=None, consumer_mobile=None, eyesight=None, create_time=None):
-        where = {}
-        if channel_name:
-            channel_list = tools.channel_name_to_id(channel_name)
-            if channel_list:
-                where.update({'channel_id': ('in', channel_list)})
-            else:
-                return []
+    def _query_handler(self, store_name=None, consumer_id=None, eyesight=None, create_time=None):
+        where = {'channel_id': self.channel_id}
 
         if store_name:
             store_list = tools.store_name_to_id(store_name)
@@ -188,15 +187,11 @@ class TrainUseInfoHandler(core.Handler):
             else:
                 return []
 
-        if consumer_mobile:
-            consumer_list = tools.mobile_to_id(consumer_mobile)
-            if consumer_list:
-                where.update({'consumer_id': ('in', consumer_list)})
-            else:
-                return []
+        if consumer_id:
+            where.update({'consumer_id': consumer_id})
 
         if eyesight:
-            eyesight_list = tools.mobile_to_id(eyesight)
+            eyesight_list = tools.nickname_to_id(eyesight)
             if eyesight_list:
                 where.update({'eyesight_id': ('in', eyesight_list)})
             else:
@@ -222,14 +217,12 @@ class TrainUseInfoHandler(core.Handler):
             return []
 
         for item in data:
-            channel_ret = self.db.select_one(table='channel', fields='channel_name', where={'id': item['channel_id']})
             store_ret = self.db.select_one(table='stores', fields='store_name', where={'id': item['store_id']})
             device_name = self.db.select_one(table='device', fields='device_name', where={'id': item['device_id']})
-            eyesight_name = self.db.select_one(table='auth_user', fields='username', where={'id': item['eyesight_id']})
-            item['channel_name'] = channel_ret.get('channel_name') if channel_ret else ''
+            eyesight_name = self.db.select_one(table='auth_user', fields='nick_name', where={'id': item['eyesight_id']})
             item['store_name'] = store_ret.get('store_name') if store_ret else ''
             item['device_name'] = device_name.get('device_name') if device_name else ''
-            item['eyesight_name'] = eyesight_name.get('username') if eyesight_name else ''
+            item['eyesight_name'] = eyesight_name.get('nick_name') if eyesight_name else ''
             item['create_time'] = item['ctime'].strftime('%Y-%m-%d %H:%M:%S')
             item['status'] = UYU_TRAIN_USE_MAP.get(item['status'], '')
 
@@ -246,27 +239,61 @@ class TrainUseInfoHandler(core.Handler):
             return error(UAURET.SERVERERR)
 
 #渠道系统用
-#class ChanBuyTrainingsOrderHandler(core.Handler):
-#    _post_handler_fields = [
-#        Field("busicd", T_STR, False, match=r'^([0-9]{6})$'),
-#        Field('channel_id', T_STR, False),
-#        Field('training_times', T_INT, False),
-#        Field('training_amt', T_INT, False),
-#        Field('ch_training_amt_per', T_INT, False),
-#    ]
-#
-#    @with_validator_self
-#    def _post_handler(self):
-#        params = self.validator.data
-#        log.debug("client data: %s", params)
-#        top = TrainingOP(params)
-#        ret = top.create_chan_buy_trainings_order()
-#        if ret == UYU_OP_ERR:
-#            return error(UAURET.ORDERERR)
-#        return success({})
-#
-#    def POST(self):
-#        return self._post_handler()
+
+class ChanBuyTrainingsOrderHandler(core.Handler):
+    """渠道向公司购买"""
+    _post_handler_fields = [
+        Field("busicd", T_STR, False, match=r'^([0-9]{6})$'),
+        Field('channel_id', T_STR, False),
+        Field('training_times', T_INT, False),
+        Field('training_amt', T_INT, False),
+        Field('ch_training_amt_per', T_INT, False),
+        Field('remark', T_STR, True),
+    ]
+
+    @with_database('uyu_core')
+    def _check_permission(self, params):
+        channel_id = params["channel_id"]
+        channel_reocord = self.db.select_one("channel", {"id": channel_id})
+        training_amt = params["training_amt"]
+        training_times = params["training_times"]
+        ch_training_amt_per = params["ch_training_amt_per"]
+
+        is_valid = channel_reocord["is_valid"]
+
+        if is_valid == define.UYU_CHAN_STATUS_CLOSE:
+            return UYU_OP_ERR
+
+        if ch_training_amt_per != channel_reocord["training_amt_per"] or training_amt != training_times * ch_training_amt_per:
+            return UYU_OP_ERR
+
+        return UYU_OP_OK
+
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
+    @with_validator_self
+    def _post_handler(self):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
+        params = self.validator.data
+        log.debug("client data: %s", params)
+
+        if params["busicd"] != define.BUSICD_CHAN_BUY_TRAING_TIMES:
+            log.warn('client busicd: %s real busicd: %s', params['busicd'], define.BUSICD_CHAN_BUY_TRAING_TIMES)
+            return error(UAURET.BUSICEERR)
+
+        if self._check_permission(params) == UYU_OP_ERR:
+            return error(UAURET.ORDERERR)
+
+        self.user.load_user()
+        top = TrainingOP(params, self.user.udata)
+        ret = top.create_chan_buy_trainings_order()
+        if ret == UYU_OP_ERR:
+            return error(UAURET.ORDERERR)
+        return success({})
+
+    def POST(self):
+        return self._post_handler()
+
 
 class OrgAllotToChanOrderHandler(core.Handler):
     _post_handler_fields = [
@@ -298,6 +325,8 @@ class OrgAllotToChanOrderHandler(core.Handler):
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         params = self.validator.data
         log.debug("client data: %s", params)
         if params["busicd"] != define.BUSICD_ORG_ALLOT_TO_CHAN:
@@ -317,21 +346,23 @@ class OrgAllotToChanOrderHandler(core.Handler):
 
 #FIMME
 #是否是公司帮渠道分配
-class OrgAllotToStoreOrderHandler(core.Handler):
+class ChannelAllotToStoreOrderHandler(core.Handler):
     _post_handler_fields = [
         Field("busicd", T_STR, False, match=r'^([0-9]{6})$'),
-        Field('channel_id', T_INT, False),
+        # Field('channel_id', T_INT, False),
         Field('store_id', T_INT, False),
         Field('training_times', T_INT, False),
-        # Field('training_amt', T_INT, False),
         Field('training_amt', T_FLOAT, False),
         Field('store_training_amt_per', T_INT, False),
+        Field('remark', T_STR, True),
     ]
 
     @with_database('uyu_core')
     def _check_permission(self, params):
         store_id = params["store_id"]
-        chan_id = params["channel_id"]
+        chan_id = self.channel_id
+        params["channel_id"] = chan_id
+
         store_record = self.db.select_one("stores", {"id": store_id})
         chan_record = self.db.select_one("channel", {"id": chan_id})
 
@@ -355,8 +386,15 @@ class OrgAllotToStoreOrderHandler(core.Handler):
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         params = self.validator.data
         log.debug("client data: %s", params)
+
+        uop = UUser()
+        uop.call('load_info_by_userid', self.user.userid)
+        self.channel_id = uop.cdata['chnid']
+
         if params["busicd"] != define.BUSICD_CHAN_ALLOT_TO_STORE:
             return error(UAURET.BUSICEERR)
 
@@ -387,6 +425,8 @@ class OrderCancelHandler(core.Handler):
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
         params = self.validator.data
         order_no = params["order_no"]
         log.debug("order_no: %s", order_no)
