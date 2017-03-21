@@ -341,7 +341,7 @@ $(document).ready(function(){
         post_data.store_id = store_id;
         post_data.store_training_amt_per = st_training_amt_per;
         post_data.training_times = training_times;
-        post_data.training_amt = training_amt * 100;
+        post_data.training_amt = (training_amt * 100).toFixed(2);
         post_data.remark = remark;
         post_data.busicd = "CHAN_ALLOT_TO_STORE";
 
