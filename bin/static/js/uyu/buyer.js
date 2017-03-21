@@ -201,8 +201,10 @@ $(document).ready(function(){
         var training_amt = $('#training_amt').val() * 100;
         var channel_id = $("#chnid").text();
         var ch_training_amt_per = $("#channel_training_amt_per").val();
+		var remark = $("#b_remark").val();
 
         post_data.busicd = "CHAN_BUY";
+		post_data.remark = remark;
         post_data.channel_id = channel_id;
         post_data.training_times = training_times;
         post_data.training_amt = parseInt(training_amt.toFixed(2));
