@@ -1,4 +1,6 @@
 $(document).ready(function(){
+    get_remain_times();
+
     $.validator.addMethod("PositiveNumber", function(value, element) {
         if(value <=0){
             return false;
@@ -153,6 +155,7 @@ $(document).ready(function(){
 
     $("#training_buyer").click(function(){
         $("#trainBuyerCreateForm").resetForm();
+        $("label.error").remove();
         var get_data = {};
         var se_userid = window.localStorage.getItem('myid');
         get_data.se_userid = se_userid;
@@ -193,6 +196,35 @@ $(document).ready(function(){
     });
 
     $("#trainBuyerCreateSubmit").click(function(){
+        var buyer_vt = $("#trainBuyerCreateForm").validate({
+            rules: {
+                training_times: {
+                    required: true,
+                    range:[10, 100],
+                    digits: true
+                },
+                remark: {
+                    required: false,
+                    maxlength: 256
+                }
+            },
+            messages: {
+                training_times: {
+                    required: '请输入购买的训练次数',
+                    digits: "只能输入整数",
+                    range: $.validator.format("请输入一个介于 {0} 和 {1} 之间的值")
+                },
+                remark: {
+                    maxlength: $.validator.format("请输入一个 长度最多是 {0} 的字符")
+                }
+            }
+        });
+
+        var ok = buyer_vt.form();
+        if(!ok){
+            return false;
+        }
+
         var post_url = '/channel/v1/api/channel_buy_order';
         var post_data = {};
         var se_userid = window.localStorage.getItem('myid');
@@ -237,8 +269,8 @@ $(document).ready(function(){
     });
 
     $("#training_allocate").click(function () {
-
         $("#trainAllocateCreateForm").resetForm();
+        $("label.error").remove();
 
         var get_data = {};
         var se_userid = window.localStorage.getItem('myid');
@@ -328,6 +360,36 @@ $(document).ready(function(){
     });
 
     $("#trainAllocateCreateSubmit").click(function(){
+        var remain_times = parseInt($("#remain_times").text());
+        var allocate_vt = $("#trainAllocateCreateForm").validate({
+            rules: {
+                training_times: {
+                    required: true,
+                    range:[1, remain_times],
+                    digits: true
+                },
+                remark: {
+                    required: false,
+                    maxlength: 256
+                }
+            },
+            messages: {
+                training_times: {
+                    required: '请输入分配的训练次数',
+                    digits: "只能输入整数",
+                    range: $.validator.format("请输入一个介于 {0} 和 {1} 之间的值")
+                },
+                remark: {
+                    maxlength: $.validator.format("请输入一个长度最多是 {0} 的字符")
+                }
+            }
+        });
+
+        var ok = allocate_vt.form();
+        if(!ok){
+            return false;
+        }
+
         var post_data = {};
         var se_userid = window.localStorage.getItem('myid');
         post_data.se_userid = se_userid;
@@ -362,6 +424,7 @@ $(document).ready(function(){
                     toastr.success('分配成功');
                     $("#trainAllocateCreateModal").modal('hide');
                     $('#trainBuyerList').DataTable().draw();
+                    get_remain_times();
                 }
             },
             error: function(data){
@@ -370,3 +433,34 @@ $(document).ready(function(){
 
     });
 });
+
+
+function get_remain_times(){
+    var get_data = {};
+    var se_userid = window.localStorage.getItem('myid');
+    get_data.se_userid = se_userid;
+
+    $.ajax({
+        url: '/channel/v1/api/remain_times',
+        type: 'GET',
+        dataType: 'json',
+        data: get_data,
+        success: function(data){
+            var respcd = data.respcd;
+            if(respcd != '0000'){
+                var resperr = data.resperr;
+                var respmsg = data.respmsg;
+                var msg = resperr ? resperr : respmsg;
+                toastr.warning(msg);
+            }
+            else {
+                var info = data.data;
+                var remain_times = info.remain_times;
+                $("#remain_times").text(remain_times);
+            }
+        },
+        error: function(data){
+            toastr.warning('获取剩余次数异常');
+        }
+    });
+}
