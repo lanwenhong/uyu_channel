@@ -20,6 +20,7 @@ $(document).ready(function(){
                 $('.panel-title').text(channel_data.channel_name);
                 $('#channel_id').text(channel_data.chnid);
                 $('#channel_name').text(channel_data.channel_name);
+                $('#remain_times').text(channel_data.remain_times);
                 $('#contact_name').text(profile_data.contact_name);
                 $('#contact_phone').text(profile_data.contact_phone);
             }
