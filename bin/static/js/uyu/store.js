@@ -645,7 +645,7 @@ $(document).ready(function(){
         var store_mobile = $('#e_store_mobile').val();
         var store_addr = $('#e_store_addr').val();
         var store_type = $('#e_store_type').val();
-		var training_amt_per= $('#e_training_amt_per').val() * 100;
+		var training_amt_per= parseInt($('#e_training_amt_per').val() * 100);
 		var divide_percent= $('#e_divide_percent').val();
 		var business = $('#e_business').val();
 		var front_business = $('#e_front_business').val();
