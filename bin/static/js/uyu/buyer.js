@@ -201,7 +201,8 @@ $(document).ready(function(){
                 training_times: {
                     required: true,
                     range:[10, 100],
-                    digits: true
+                    digits: true,
+                    PositiveNumber: "#training_times"
                 },
                 remark: {
                     required: false,
@@ -215,7 +216,7 @@ $(document).ready(function(){
                     range: $.validator.format("请输入一个介于 {0} 和 {1} 之间的值")
                 },
                 remark: {
-                    maxlength: $.validator.format("请输入一个 长度最多是 {0} 的字符")
+                    maxlength: $.validator.format("请输入一个长度最多是 {0} 的字符")
                 }
             }
         });
@@ -366,7 +367,8 @@ $(document).ready(function(){
                 training_times: {
                     required: true,
                     range:[1, remain_times],
-                    digits: true
+                    digits: true,
+                    PositiveNumber: "#a_training_times"
                 },
                 remark: {
                     required: false,
