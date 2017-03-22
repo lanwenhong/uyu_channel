@@ -279,7 +279,8 @@ $(document).ready(function(){
         var store_contacter = $('#store_contacter').val();
         var store_mobile = $('#store_mobile').val();
         var store_addr = $('#store_addr').val();
-		var training_amt_per= $('#training_amt_per').val() * 100;
+        var store_type = $('#store_type').val();
+		var training_amt_per= parseInt($('#training_amt_per').val() * 100);
 		var divide_percent= $('#divide_percent').val();
 		var business = $('#business').val();
 		var front_business = $('#front_business').val();
@@ -304,6 +305,7 @@ $(document).ready(function(){
 		post_data['store_contacter'] = store_contacter;
 		post_data['store_mobile'] = store_mobile;
 		post_data['store_addr'] = store_addr;
+        post_data['store_type'] = store_type;
 		post_data['training_amt_per'] = training_amt_per;
 		post_data['business'] = business;
 		post_data['front_business'] = front_business;
@@ -434,6 +436,7 @@ $(document).ready(function(){
                     $('#e_store_contacter').val(ch_data.store_contacter);
                     $('#e_store_mobile').val(ch_data.store_mobile);
                     $('#e_store_addr').val(ch_data.store_addr);
+                    $('#e_store_type').val(ch_data.store_type);
                     $('#storeEditModal').modal();
                 }
 	        },
@@ -641,6 +644,7 @@ $(document).ready(function(){
         var store_contacter = $('#e_store_contacter').val();
         var store_mobile = $('#e_store_mobile').val();
         var store_addr = $('#e_store_addr').val();
+        var store_type = $('#e_store_type').val();
 		var training_amt_per= $('#e_training_amt_per').val() * 100;
 		var divide_percent= $('#e_divide_percent').val();
 		var business = $('#e_business').val();
@@ -664,6 +668,7 @@ $(document).ready(function(){
 		post_data['store_contacter'] = store_contacter;
 		post_data['store_mobile'] = store_mobile;
 		post_data['store_addr'] = store_addr;
+        post_data['store_type'] = store_type;
 		post_data['training_amt_per'] = training_amt_per;
 
 		post_data['business'] = business;

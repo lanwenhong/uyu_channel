@@ -115,9 +115,9 @@ $(document).ready(function(){
                     var now = new Date();
                     var compare_time = new Date(Year=now.getFullYear(), Months=now.getMonth(), Day=now.getDate(), Hours=0, Minutes=0, senconds=0);
                     if(busicd === "CHAN_ALLOT_TO_STORE" && is_valid === 0 && create_time >= compare_time){
-                        var cancel = '<input type="button" class="btn btn-primary btn-sm order-cancel" data-orderno='+orderno+' value=' + '撤销' + '>';
+                        var cancel = '<input type="button" class="btn btn-primary btn-sm order-cancel" data-busicd='+busicd+' data-orderno='+orderno+' value=' + '撤销' + '>';
                     } else {
-                        var cancel = '<input type="button" class="btn btn-primary btn-sm order-cancel"  disabled data-orderno='+orderno+' value=' + '撤销' + '>';
+                        var cancel = '<input type="button" class="btn btn-primary btn-sm order-cancel" data-busicd='+busicd+' disabled data-orderno='+orderno+' value=' + '撤销' + '>';
                     }
 
                     return cancel;
@@ -327,6 +327,7 @@ $(document).ready(function(){
 
     $(document).on('click', '.order-cancel', function(){
         var orderno = $(this).data('orderno');
+        var busicd = $(this).data('busicd');
         var se_userid = window.localStorage.getItem('myid');
         if(!orderno){
             toastr.warning('请确认订单号');
@@ -335,6 +336,7 @@ $(document).ready(function(){
         var post_data = {};
         post_data.se_userid = se_userid;
         post_data.order_no = orderno;
+        post_data.busicd = busicd;
         $.ajax({
             url: '/channel/v1/api/order_cancel',
             type: 'POST',
@@ -405,7 +407,7 @@ $(document).ready(function(){
         post_data.store_id = store_id;
         post_data.store_training_amt_per = st_training_amt_per;
         post_data.training_times = training_times;
-        post_data.training_amt = (training_amt * 100).toFixed(2);
+        post_data.training_amt = parseInt(training_amt * 100);
         post_data.remark = remark;
         post_data.busicd = "CHAN_ALLOT_TO_STORE";
 
