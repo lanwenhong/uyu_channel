@@ -351,3 +351,36 @@ class ChanStoreMap(core.Handler):
             log.warn(e)
             log.warn(traceback.format_exc())
             return error(UAURET.SERVERERR)
+
+
+class ChannelRemainTimesHandler(core.Handler):
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
+    def _get_handler(self, *args):
+        if not self.user.sauth:
+            return error(UAURET.SESSIONERR)
+        try:
+            uop = UUser()
+            uop.call('load_info_by_userid', self.user.userid)
+            channel_id = uop.cdata['chnid']
+            data = self._query_handler(channel_id)
+            return success(data)
+        except Exception as e:
+            log.warn(e)
+            log.warn(traceback.format_exc())
+            return error(UAURET.DATAERR)
+
+
+    @with_database('uyu_core')
+    def _query_handler(self, channel_id):
+        ret = self.db.select_one(table='channel', fields='remain_times', where={'id': channel_id})
+        return ret
+
+
+    def GET(self):
+        try:
+            data = self._get_handler()
+            return data
+        except Exception as e:
+            log.warn(e)
+            log.warn(traceback.format_exc())
+            return error(UAURET.SERVERERR)

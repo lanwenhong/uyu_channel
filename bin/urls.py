@@ -33,6 +33,7 @@ urls = (
     ('^/channel/v1/api/chninfo_pagelist$', channel.ChannelInfoHandler),
     ('^/channel/v1/api/chan_name_list$', channel.ChanNameList),
     ('^/channel/v1/api/chan_store_list$', channel.ChanStoreMap),
+    ('^/channel/v1/api/remain_times$', channel.ChannelRemainTimesHandler),
 
 
     #门店API
