@@ -287,15 +287,13 @@ $(document).ready(function(){
     $('#deviceAllocateSubmit').click(function () {
         var serial_number = $('#a_serial_number').val();
         var store_id = $('#a_store_name').val();
-        if(!store_id){
-            toastr.warning('请核实分配的门店');
-            return false;
-        }
         var post_data = {};
         var se_userid = window.localStorage.getItem('myid');
         post_data.se_userid = se_userid;
         post_data.serial_number = serial_number;
-        post_data.store_id = store_id;
+        if(store_id){
+            post_data.store_id = store_id;
+        }
 
         $.ajax({
             url: '/channel/v1/api/allocate_device',
