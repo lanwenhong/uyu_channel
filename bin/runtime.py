@@ -1,10 +1,10 @@
 #coding: utf-8
 
 import os, sys
-HOME = os.path.dirname(os.path.abspath(__file__))
-from zbase.base import loader
+#HOME = os.path.dirname(os.path.abspath(__file__))
+#from zbase.base import loader
 
-loader.loadconf_argv(HOME)
+#loader.loadconf_argv(HOME)
 import config
 import redis
 
