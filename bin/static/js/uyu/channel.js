@@ -9,7 +9,8 @@ $(document).ready(function(){
 
     $.validator.addMethod("isYuan", function(value, element) {
         var length = value.length;
-        var yuan  = /^([0-9]{1,6})\.([0-9]{1,2})$/;
+        //var yuan  = /^([0-9]{1,6})\.([0-9]{1,2})$/;
+        var yuan = /^([0-9]{1,6})(.([0-9]{1,2})){0,1}$/;
         return this.optional(element) || (length && yuan.test(value));
     }, "请正确填写您的价格");
 
