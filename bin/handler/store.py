@@ -169,7 +169,7 @@ class StoreHandler(core.Handler):
         Field('divide_percent', T_FLOAT, True),
         Field('store_contacter', T_STR, False),
         Field('store_mobile', T_REG, False, match=r'^(1\d{10})$'),
-        Field('store_addr', T_STR, False),
+        # Field('store_addr', T_STR, False),
         Field('store_name', T_STR, False),
         Field("store_type", T_INT, False, match=r'^([0-1]{1})$'),
     ]
@@ -318,7 +318,7 @@ class CreateStoreHandler(core.Handler):
         Field('divide_percent', T_FLOAT, True),
         Field('store_contacter', T_STR, False),
         Field('store_mobile', T_REG, False, match=r'^(1\d{10})$'),
-        Field('store_addr', T_STR, False),
+        # Field('store_addr', T_STR, False),
         Field('store_name', T_STR, False),
         Field("store_type", T_INT, False, match=r'^([0-1]{1})$'),
     ]
