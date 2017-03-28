@@ -337,29 +337,49 @@ $(document).ready(function(){
         post_data.se_userid = se_userid;
         post_data.order_no = orderno;
         post_data.busicd = busicd;
-        $.ajax({
-            url: '/channel/v1/api/order_cancel',
-            type: 'POST',
-            data: post_data,
-            dataType: 'json',
-            success: function(data) {
-                var respcd = data.respcd;
-                if(respcd != '0000'){
-                    var resperr = data.resperr;
-                    var respmsg = data.respmsg;
-                    var msg = resperr ? resperr : respmsg;
-                    toastr.warning(msg);
+
+        $.confirm({
+            title: '请确认取消',
+            content: '撤销将把次数从对方扣回，确认是否撤销？',
+            type: 'blue',
+            typeAnimated: true,
+            buttons: {
+                confirm: {
+                    text: '确认',
+                    btnClass: 'btn-red',
+                    action: function() {
+                        $.ajax({
+                            url: '/channel/v1/api/order_cancel',
+                            type: 'POST',
+                            data: post_data,
+                            dataType: 'json',
+                            success: function(data) {
+                                var respcd = data.respcd;
+                                if(respcd != '0000'){
+                                    var resperr = data.resperr;
+                                    var respmsg = data.respmsg;
+                                    var msg = resperr ? resperr : respmsg;
+                                    toastr.warning(msg);
+                                }
+                                else {
+                                    toastr.success('撤销成功');
+                                    $('#trainBuyerList').DataTable().draw();
+                                }
+                            },
+                            error: function(data) {
+                                toastr.warning('请求异常');
+                            }
+                        });
+                    }
+                },
+                cancel: {
+                    text: '取消',
+                    action: function() {
+                        console.log('clicked cancel');
+                    }
                 }
-                else {
-                    toastr.success('撤销成功');
-                    $('#trainBuyerList').DataTable().draw();
-                }
-            },
-            error: function(data) {
-                toastr.warning('请求异常');
             }
         });
-
     });
 
     $("#trainAllocateCreateSubmit").click(function(){
