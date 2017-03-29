@@ -35,7 +35,6 @@ urls = (
     ('^/channel/v1/api/chan_store_list$', channel.ChanStoreMap),
     ('^/channel/v1/api/remain_times$', channel.ChannelRemainTimesHandler),
 
-
     #门店API
     ('^/channel/v1/api/store_set_state', store.StoreStateSetHandler),
     ('^/channel/v1/api/store_create$', store.CreateStoreHandler),
@@ -62,4 +61,7 @@ urls = (
     #设备
     ('^/channel/v1/api/create_device$', device.DeviceCreateHandler),
     ('^/channel/v1/api/allocate_device$', device.DeviceAllocateHandler),
+
+    # 结算
+    ('^/channel/v1/api/settle_list$', settle.SettleInfoHandler),
 )
