@@ -1,14 +1,20 @@
 $(document).ready(function(){
+
+    message = '';
+
     get_remain_times();
 
     $.validator.addMethod("PositiveNumber", function(value, element) {
-        if(value <=0){
+        var remain_times = parseInt($("#remain_times").text());
+
+        if(value <=0 || value > remain_times){
+            message = "请正确填写您的次数大于0和"+remain_times+"之间";
             return false;
         }
         else {
             return true;
         }
-    }, "请正确填写您的次数");
+    }, message);
 
     /*
     $("#training_times").bind('input propertychange', function () {
@@ -361,7 +367,7 @@ $(document).ready(function(){
             rules: {
                 training_times: {
                     required: true,
-                    range:[1, remain_times],
+                    //range:[1, remain_times],
                     digits: true,
                     PositiveNumber: "#a_training_times"
                 },
@@ -374,7 +380,7 @@ $(document).ready(function(){
                 training_times: {
                     required: '请输入分配的训练次数',
                     digits: "只能输入整数",
-                    range: $.validator.format("请输入一个介于 {0} 和 {1} 之间的值")
+                    //range: $.validator.format("请输入一个介于 {0} 和 {1} 之间的值")
                 },
                 remark: {
                     maxlength: $.validator.format("请输入一个长度最多是 {0} 的字符")
