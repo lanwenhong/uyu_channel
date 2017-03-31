@@ -1,20 +1,32 @@
 $(document).ready(function(){
 
-    message = '';
-
     get_remain_times();
 
-    $.validator.addMethod("PositiveNumber", function(value, element) {
+    $.validator.addMethod("PositiveNumber", function(value, element, param) {
+        var customMsg = '';
+        var result = true;
         var remain_times = parseInt($("#remain_times").text());
-
-        if(value <=0 || value > remain_times){
-            message = "请正确填写您的次数大于0和"+remain_times+"之间";
-            return false;
+        if(remain_times<=0){
+           customMsg = '该渠道最大次数已不能分配:' + remain_times;
+           result = false;
+        } else {
+            if(value <= 0){
+                customMsg = "次数需大于0";
+                result = false;
+            }
+            else {
+                if(value > remain_times){
+                    customMsg = "请输入介于1和"+remain_times+"的数";
+                    result = false;
+                }
+                else{
+                     result =true;
+                }
+            }
         }
-        else {
-            return true;
-        }
-    }, message);
+        $.validator.messages.PositiveNumber = customMsg;
+        return result;
+    });
 
     /*
     $("#training_times").bind('input propertychange', function () {
