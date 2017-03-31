@@ -10,11 +10,13 @@ $(document).ready(function(){
         }
     }, "请正确填写您的次数");
 
+    /*
     $("#training_times").bind('input propertychange', function () {
         var amount_per = 0;
         amount_per = $('#channel_training_amt_per').val();
         $('#training_amt').val(($(this).val() * amount_per).toFixed(2));
     });
+    */
 
     $("#a_training_times").bind('input propertychange', function () {
         var amount_per = $('#a_store_training_amt_per').val();
@@ -156,39 +158,8 @@ $(document).ready(function(){
     $("#training_buyer").click(function(){
         $("#trainBuyerCreateForm").resetForm();
         $("label.error").remove();
-        var get_data = {};
-        var se_userid = window.localStorage.getItem('myid');
-        get_data.se_userid = se_userid;
-        get_data.userid = se_userid;
-        $.ajax({
-            url: '/channel/v1/api/channel',
-            type: 'GET',
-            dataType: 'json',
-            data: get_data,
-            success: function(data) {
-                var respcd = data.respcd;
-                if(respcd != '0000'){
-                    var resperr = data.resperr;
-                    var respmsg = data.respmsg;
-                    var msg = resperr ? resperr : respmsg;
-                    toastr.warning(msg);
-                    return false;
-                }
-                else {
-                    var ch_data = data.data.chn_data;
-                    var training_amt_per = ch_data.training_amt_per;
-                    training_amt_per = (training_amt_per / 100).toFixed(2);
-                    var channel_id = ch_data.chnid;
-                    $("#chnid").text(channel_id);
-                    $("#channel_training_amt_per").val(training_amt_per);
-                    $("#trainBuyerCreateModal").modal();
-                }
-            },
-            error: function(data) {
-                toastr.warning('请求异常');
-                return false;
-            }
-        });
+        rules_select();
+        get_channel_info();
     });
 
     $("#trainBuyerSearch").click(function(){
@@ -200,7 +171,7 @@ $(document).ready(function(){
             rules: {
                 training_times: {
                     required: true,
-                    range:[10, 100],
+                    //range:[10, 100],
                     digits: true,
                     PositiveNumber: "#training_times"
                 },
@@ -212,8 +183,8 @@ $(document).ready(function(){
             messages: {
                 training_times: {
                     required: '请输入购买的训练次数',
-                    digits: "只能输入整数",
-                    range: $.validator.format("请输入一个介于 {0} 和 {1} 之间的值")
+                    //range: $.validator.format("请输入一个介于 {0} 和 {1} 之间的值")
+                    digits: "只能输入整数"
                 },
                 remark: {
                     maxlength: $.validator.format("请输入一个长度最多是 {0} 的字符")
@@ -235,6 +206,7 @@ $(document).ready(function(){
         var channel_id = $("#chnid").text();
         var ch_training_amt_per = $("#channel_training_amt_per").val();
 		var remark = $("#b_remark").val();
+		var rule_id = $(".c_rules").val();
 
         post_data.busicd = "CHAN_BUY";
 		post_data.remark = remark;
@@ -242,6 +214,7 @@ $(document).ready(function(){
         post_data.training_times = training_times;
         post_data.training_amt = parseInt(training_amt.toFixed(2));
         post_data.ch_training_amt_per = parseInt((ch_training_amt_per * 100).toFixed(2));
+        post_data.rule_id = rule_id;
 
         $.ajax({
             url: post_url,
@@ -456,6 +429,13 @@ $(document).ready(function(){
         });
 
     });
+
+    $(".c_rules").change(function () {
+        var total_amt = $(".c_rules option:selected").data('total_amt');
+        var training_times = $(".c_rules option:selected").data('training_times');
+        $("#training_times").val(training_times).attr("readonly", "readonly");
+        $("#training_amt").val(total_amt).attr("readonly", "readonly");
+    })
 });
 
 
@@ -485,6 +465,92 @@ function get_remain_times(){
         },
         error: function(data){
             toastr.warning('获取剩余次数异常');
+        }
+    });
+}
+
+
+function rules_select() {
+    var get_data = {};
+    var se_userid = window.localStorage.getItem('myid');
+    get_data['se_userid'] = se_userid;
+
+    $.ajax({
+        url: '/channel/v1/api/rules_list',
+        type: 'GET',
+        data: get_data,
+        dataType: 'json',
+        success: function(data) {
+            var respcd = data.respcd;
+            if(respcd != '0000'){
+                var resperr = data.resperr;
+                var respmsg = data.respmsg;
+                var msg = resperr ? resperr : respmsg;
+                toastr.warning(msg);
+            }
+            else {
+                if(data.data.length==0){
+                    return false;
+                }  else {
+
+                    var c_rules = $("#c_rules");
+                    for(var i=0; i<data.data.length; i++){
+                        var rule_id = data.data[i].id;
+                        var rule_name = data.data[i].name;
+                        var rule_total_amt = data.data[i].total_amt;
+                        var rule_training_times = data.data[i].training_times;
+
+                        var option_str = $('<option value='+rule_id+' data-total_amt='+rule_total_amt+' data-training_times='+rule_training_times+'>'+rule_name+'</option>');
+                        option_str.prependTo(c_rules);
+                    }
+                    $("#c_rules option:first").prop("selected", 'selected');
+                    var total_amt = $(".c_rules option:selected").data('total_amt');
+                    var training_times = $(".c_rules option:selected").data('training_times');
+                    $("#training_times").val(training_times).attr("readonly", "readonly");
+                    $("#training_amt").val(total_amt).attr("readonly", "readonly");
+                }
+            }
+        },
+        error: function(data) {
+            toastr.warning('请求异常');
+        }
+    });
+
+}
+
+
+function get_channel_info() {
+    var get_data = {};
+    var se_userid = window.localStorage.getItem('myid');
+    get_data.se_userid = se_userid;
+    get_data.userid = se_userid;
+    $.ajax({
+        url: '/channel/v1/api/channel',
+        type: 'GET',
+        dataType: 'json',
+        data: get_data,
+        success: function(data) {
+            var respcd = data.respcd;
+            if(respcd != '0000'){
+                var resperr = data.resperr;
+                var respmsg = data.respmsg;
+                var msg = resperr ? resperr : respmsg;
+                toastr.warning(msg);
+                return false;
+            }
+            else {
+                var ch_data = data.data.chn_data;
+                var training_amt_per = ch_data.training_amt_per;
+                training_amt_per = (training_amt_per / 100).toFixed(2);
+                var channel_id = ch_data.chnid;
+                $("#chnid").text(channel_id);
+                $("#channel_training_amt_per").val(training_amt_per);
+                $("#trainBuyerCreateModal").modal();
+            }
+        },
+        error: function(data) {
+            toastr.warning('请求异常');
+            return false;
         }
     });
 }
