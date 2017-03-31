@@ -245,6 +245,7 @@ class ChanBuyTrainingsOrderHandler(core.Handler):
     _post_handler_fields = [
         Field("busicd", T_STR, False, match=r'^([0-9]{6})$'),
         Field('channel_id', T_STR, False),
+        Field('rule_id', T_INT, False),
         Field('training_times', T_INT, False),
         Field('training_amt', T_INT, False),
         Field('ch_training_amt_per', T_INT, False),
@@ -254,7 +255,9 @@ class ChanBuyTrainingsOrderHandler(core.Handler):
     @with_database('uyu_core')
     def _check_permission(self, params):
         channel_id = params["channel_id"]
+        rule_id = params["rule_id"]
         channel_reocord = self.db.select_one("channel", {"id": channel_id})
+        rule_record = self.db.select_one("rules", {"id": rule_id})
         training_amt = params["training_amt"]
         training_times = params["training_times"]
         ch_training_amt_per = params["ch_training_amt_per"]
@@ -264,8 +267,12 @@ class ChanBuyTrainingsOrderHandler(core.Handler):
         if is_valid == define.UYU_CHAN_STATUS_CLOSE:
             return UYU_OP_ERR
 
-        if ch_training_amt_per != channel_reocord["training_amt_per"] or training_amt != training_times * ch_training_amt_per:
-            return UYU_OP_ERR
+        # if ch_training_amt_per != channel_reocord["training_amt_per"] or training_amt != training_times * ch_training_amt_per:
+        #     return UYU_OP_ERR
+
+        if rule_id != 0 and rule_record:
+            if training_amt != rule_record['total_amt'] or training_times != rule_record['training_times']:
+                return UYU_OP_ERR
 
         return UYU_OP_OK
 
