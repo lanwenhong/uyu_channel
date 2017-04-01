@@ -191,7 +191,7 @@ $(document).ready(function(){
                     required: true,
                     //range:[10, 100],
                     digits: true,
-                    PositiveNumber: "#training_times"
+                    //PositiveNumber: "#training_times"
                 },
                 remark: {
                     required: false,
