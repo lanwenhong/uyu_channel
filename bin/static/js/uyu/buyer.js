@@ -124,6 +124,22 @@ $(document).ready(function(){
         },
         'columnDefs': [
             {
+                targets: 0,
+                render: function(data, type, full){
+                    var tmp = '';
+                    var busicd = full.busicd;
+                    var buyer = full.buyer;
+                    var buyer_id = full.buyer_id;
+
+                    if(busicd === 'ORG_ALLOT_TO_CHAN' || busicd === 'CHAN_BUY') {
+                        tmp = '<span class="buyer-name" data-buyer_id='+buyer_id+'>'+buyer+'</span>';
+                    } else {
+                        tmp = '<span>'+buyer+'</span>';
+                    }
+                    return tmp;
+                }
+            },
+            {
                 targets: 12,
                 data: '操作',
                 render: function(data, type, full) {
@@ -371,6 +387,47 @@ $(document).ready(function(){
                 }
             }
         });
+    });
+
+    $(document).on('click', '.buyer-name', function(){
+        $("#channel_info").resetForm();
+        var buyer_id = $(this).data('buyer_id');
+        var se_userid = window.localStorage.getItem('myid');
+        var get_data = {};
+        get_data.userid = buyer_id;
+        get_data.se_userid = se_userid;
+        $.ajax({
+            url: '/channel/v1/api/channel',
+            type: 'GET',
+            data: get_data,
+            dataType: 'json',
+            success: function(data) {
+                var respcd = data.respcd;
+                if(respcd != '0000'){
+                    var resperr = data.resperr;
+                    var respmsg = data.respmsg;
+                    var msg = resperr ? resperr : respmsg;
+                    toastr.warning(msg);
+                }
+                else {
+                    var chn_data = data.data.chn_data;
+                    var profile = data.data.profile;
+                    var u_data = data.data.u_data;
+                    // console.dir(chn_data);
+                    // console.dir(profile);
+                    // console.dir(u_data);
+                    $("#channel_name").text(chn_data.channel_name);
+                    $("#contact_name").text(profile.contact_name);
+                    $("#contact_phone").text(profile.contact_phone);
+                    $("#v_remain_times").text(chn_data.remain_times);
+                    $("#channelInfoModal").modal();
+                }
+            },
+            error: function(data) {
+                toastr.warning('请求异常');
+            }
+        });
+        console.log('buyer_id: '+ buyer_id);
     });
 
     $("#trainAllocateCreateSubmit").click(function(){
