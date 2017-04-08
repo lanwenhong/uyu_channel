@@ -393,6 +393,7 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.viewStore', function(){
+        $("#storeEditForm").resetForm();
         $("label.error").remove();
         var uid = $(this).data('uid');
         //var is_prepayment = $(this).data('is_prepayment');

@@ -104,7 +104,7 @@ class StoreInfoHandler(core.Handler):
 
         keep_fields = ['stores.id', 'stores.userid', 'stores.channel_id', 'stores.store_type', 'stores.store_contacter',
                        'stores.store_mobile', 'stores.store_addr', 'stores.training_amt_per', 'stores.divide_percent',
-                       'stores.remain_times', 'stores.is_valid', 'stores.ctime', 'stores.store_name', 'channel.is_prepayment', 'channel.channel_name']
+                       'stores.remain_times', 'stores.is_valid', 'stores.ctime', 'stores.store_name', 'stores.is_prepayment', 'channel.channel_name']
 
         ret = self.db.select_join(table1='stores', table2='channel', on={'channel.id': 'stores.channel_id'}, fields=keep_fields, where=where, other=other)
 
@@ -167,6 +167,7 @@ class StoreHandler(core.Handler):
         #门店信息
         Field('training_amt_per', T_INT, False),
         Field('divide_percent', T_FLOAT, True),
+        Field('is_prepayment', T_INT, False, match=r'^([0-1]{1})$'),
         Field('store_contacter', T_STR, False),
         Field('store_mobile', T_REG, False, match=r'^(1\d{10})$'),
         Field('store_addr', T_STR, True),
@@ -316,6 +317,7 @@ class CreateStoreHandler(core.Handler):
         #门店信息
         Field('training_amt_per', T_INT, False),
         Field('divide_percent', T_FLOAT, True),
+        Field('is_prepayment', T_INT, False, match=r'^([0-1]{1})$'),
         Field('store_contacter', T_STR, False),
         Field('store_mobile', T_REG, False, match=r'^(1\d{10})$'),
         Field('store_addr', T_STR, True),
