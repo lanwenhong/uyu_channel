@@ -88,7 +88,7 @@ class DeviceInfoHandler(core.Handler):
             where.update({'id': serial_number})
 
         if status in (0, 1):
-            where.udate({'status': status})
+            where.update({'status': status})
 
         ret = self.db.select(table='device', fields=keep_fields, where=where, other=other)
 
