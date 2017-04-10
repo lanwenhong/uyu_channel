@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-import dbenc
+# import dbenc
 import logging
 HOME = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(os.path.dirname(HOME), 'conf'))
@@ -48,9 +48,9 @@ def _trans_token_db_conf(db_settings):
 
 
 def install_db():
-    databases = _trans_token_db_conf(config.database)
-    log.info(databases)
-    dbpool.install(databases)
+    # databases = _trans_token_db_conf(config.database)
+    # log.info(databases)
+    dbpool.install(config.database)
 
 install_db()
 app = core.WebApplication(config)

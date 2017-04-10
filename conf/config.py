@@ -16,9 +16,15 @@ LOGFILE = {
 # 数据库配置
 database = {
     'uyu_core': {
-        'token': 'server_core_uyu',
-        'conn': 5,
-        'engine': 'pymysql'
+        'engine': 'pymysql',
+        'passwd': '123456',
+        'charset': 'utf8',
+        'db': 'ychannel',
+        'idle_timeout': 60,
+        'host': '127.0.0.1',
+        'user': 'yyy',
+        'port': 3306,
+        'conn': 5
     },
 }
 
