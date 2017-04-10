@@ -108,7 +108,7 @@
 		$('.logout').click(function(){
 			options = {
 				'path': '/channel',
-				'domain': '121.40.177.111',
+				'domain': document.domain,
 			};
 			$.cookie('sessionid', null, options);
 			window.location.href="/channel/v1/page/login.html"
