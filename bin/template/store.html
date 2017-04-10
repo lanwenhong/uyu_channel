@@ -26,10 +26,21 @@
                 <div class="panel-body">
 					<div class="row">
 						<form class="form-inline">
+
 							<div class="form-group">
 							  <label for="store_name">门店名称</label>
 							  <input type="text" class="form-control" id="store_name" placeholder="">
 							</div>
+
+							<div class="form-group">
+								<label for="s_is_valid">状态</label>
+								<select class="form-control" id="s_is_valid" name="is_valid">
+									<option value="-1">请选择</option>
+									<option value="0" selected>启用</option>
+									<option value="1">关闭</option>
+								</select>
+							</div>
+
 							<button type="button" class="btn btn-primary" id="storeSearch">搜索</button>
 							<button type="button" class="btn btn-default" id="storeCreate">新建门店</button>
 						</form>
@@ -41,7 +52,7 @@
 								<tr>
 									<th>id</th>
 									<th>渠道名称</th>
-									<th>门店手机号</th>
+									<th>门店电话</th>
 									<th>门店名称</th>
 									<th>门店类型</th>
 									<th>门店联系人</th>
@@ -97,7 +108,7 @@
 						</div>
 
 						<div class="form-group">
-							<label for="contact_phone" class="col-sm-2 control-label">联系人手机号</label>
+							<label for="contact_phone" class="col-sm-2 control-label">联系人电话</label>
 							<div class="col-sm-10">
 								<input type="text" class="form-control" id="contact_phone" name="contact_phone" placeholder="必填">
 							</div>
@@ -138,7 +149,7 @@
 						<div class="form-group">
 							<label for="store_name" class="col-sm-2 control-label">门店名称</label>
 							<div class="col-sm-10">
-								<input type="text" class="form-control" id="c_store_name" name="store_name" placeholder="">
+								<input type="text" class="form-control" id="c_store_name" name="store_name" placeholder="必填">
 							</div>
 						</div>
 
@@ -316,7 +327,7 @@
 						</div>
 
 						<div class="form-group">
-							<label for="contact_phone" class="col-sm-2 control-label">联系人手机号</label>
+							<label for="contact_phone" class="col-sm-2 control-label">联系人电话</label>
 							<div class="col-sm-10">
 								<input type="text" class="form-control" id="e_contact_phone" name="contact_phone" placeholder="必填">
 							</div>

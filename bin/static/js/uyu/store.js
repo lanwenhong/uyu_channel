@@ -3,8 +3,9 @@ $(document).ready(function(){
 
     $.validator.addMethod("isMobile", function(value, element) {
         var length = value.length;
-        var mobile = /^(1\d{10})$/;
-        return this.optional(element) || (length == 11 && mobile.test(value));
+        //var mobile = /^(1\d{10})$/;
+        var mobile = /^(0\d{2,3}\-\d{7,8})|(1\d{10})$/;
+        return this.optional(element) || (length >= 9 && mobile.test(value));
     }, "请正确填写您的手机号码");
 
     $.validator.addMethod("isYuan", function(value, element) {
@@ -56,6 +57,11 @@ $(document).ready(function(){
             var store_name = $("#store_name").val();
             if(store_name!=''&&store_name!=undefined){
                 get_data.store_name = store_name;
+            }
+
+            var is_valid = $("#s_is_valid").val();
+            if(is_valid!=-1){
+                get_data.is_valid = is_valid;
             }
 
             $.ajax({

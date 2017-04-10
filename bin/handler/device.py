@@ -29,6 +29,7 @@ class DeviceInfoHandler(core.Handler):
         Field('maxnum', T_INT, False),
         Field('store_name', T_STR, True),
         Field('serial_number', T_STR, True),
+        Field('status', T_INT, True),
     ]
 
     def _get_handler_errfunc(self, msg):
@@ -46,6 +47,7 @@ class DeviceInfoHandler(core.Handler):
             max_page_num = params.get('maxnum')
             store_name = params.get('store_name')
             serial_number = params.get('serial_number')
+            status = params.get('status', None)
 
             self.user.load_user()
             self.user.load_profile()
@@ -53,7 +55,7 @@ class DeviceInfoHandler(core.Handler):
             self.user.channel_id = self.user.cdata['id']
 
             start, end = tools.gen_ret_range(curr_page, max_page_num)
-            info_data = self._query_handler(store_name, serial_number)
+            info_data = self._query_handler(store_name, serial_number, status)
 
             data['info'] = self._trans_record(info_data[start:end])
             data['num'] = len(info_data)
@@ -64,7 +66,7 @@ class DeviceInfoHandler(core.Handler):
             return error(UAURET.DATAERR)
 
     @with_database('uyu_core')
-    def _query_handler(self, store_name=None, serial_number=None):
+    def _query_handler(self, store_name=None, serial_number=None, status=None):
         where = {'channel_id': self.user.channel_id}
 
         keep_fields = [
@@ -84,6 +86,9 @@ class DeviceInfoHandler(core.Handler):
 
         if serial_number:
             where.update({'id': serial_number})
+
+        if status in (0, 1):
+            where.udate({'status': status})
 
         ret = self.db.select(table='device', fields=keep_fields, where=where, other=other)
 

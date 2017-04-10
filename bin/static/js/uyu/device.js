@@ -41,6 +41,11 @@ $(document).ready(function(){
                 get_data.store_name = store_name;
             }
 
+            var status = $('#s_status').val();
+            if(status!=-1){
+                get_data.status = status;
+            }
+
             var se_userid = window.localStorage.getItem('myid');
             get_data.se_userid = se_userid;
             get_data.userid = se_userid;
