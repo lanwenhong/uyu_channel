@@ -102,7 +102,7 @@ class EyeSightInfoHandler(core.Handler):
             return error(UAURET.SERVERERR)
 
     def POST(self, *arg):
-        return self._post_handler() 
+        return self._post_handler()
 
 
 class EyeRegisterHandler(core.Handler):
@@ -115,7 +115,7 @@ class EyeRegisterHandler(core.Handler):
     ]
 
 
-    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_OP)
+    @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _post_handler(self):
         if not self.user.sauth:
