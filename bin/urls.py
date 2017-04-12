@@ -52,6 +52,7 @@ urls = (
 
     #视光师
     ('^/channel/v1/api/eyesight_info$', eyesight.EyeSightInfoHandler),
+    ('^/channel/v1/api/register_eye$', eyesight.EyeRegisterHandler),
 
     #训练订单
     ('^/channel/v1/api/channel_allot_to_store_order$', train.ChannelAllotToStoreOrderHandler),
