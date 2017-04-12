@@ -88,8 +88,13 @@ $(document).ready(function(){
                 render: function(data, type, full) {
                     var device_name = full.device_name;
                     var serial_number = full.serial_number;
+                    var hd_version = full.hd_version;
+                    var blooth_tag = full.blooth_tag;
+                    var scm_tag = full.scm_tag;
+                    var is_valid = full.is_valid;
                     var allocate = '<input type="button" class="btn btn-primary btn-sm device-allocate" data-serial_number='+serial_number+' data-device_name='+device_name+' value=' + '分配' + '>';
-                    return allocate;
+                    var edit = '<input type="button" class="btn btn-primary btn-sm device-edit" data-serial_number='+serial_number+' data-device_name='+device_name+ ' data-hd_version='+ hd_version +' data-blooth_tag='+ blooth_tag +' data-scm_tag='+scm_tag+'data-is_valid='+ is_valid +' value=' + '修改' + '>';
+                    return allocate + edit;
                 }
             }
         ],
@@ -316,6 +321,105 @@ $(document).ready(function(){
                 else {
                     toastr.success('设备分配成功');
                     $("#deviceAllocate").modal('hide');
+                    $('#deviceList').DataTable().draw();
+                }
+            },
+            error: function(data) {
+                toastr.warning('请求异常');
+            }
+        });
+    });
+
+    $(document).on('click', '.device-edit', function () {
+        $("label.error").remove();
+        $('#deviceEditForm').resetForm();
+        var device_name = $(this).data('device_name');
+        var serial_number = $(this).data('serial_number');
+        var hd_version = $(this).data('hd_version');
+        var blooth_tag = $(this).data('blooth_tag');
+        var scm_tag = $(this).data('scm_tag');
+        var is_valid = $(this).data('is_valid');
+
+        $('#e_serial_number').text(serial_number);
+        $('#e_device_name').val(device_name);
+        $('#e_hd_version').val(hd_version);
+        $('#e_blooth_tag').val(blooth_tag);
+        $('#e_scm_tag').val(scm_tag);
+        $('#e_status').val(is_valid);
+        $('#deviceEditModal').modal();
+    });
+
+    $('#deviceEditSubmit').click(function () {
+        var device_edit_vt = $('#deviceEditForm').validate({
+            rules: {
+                e_device_name: {
+                    required: true,
+                    maxlength: 256
+                },
+                e_hd_version: {
+                    required: true,
+                    maxlength: 128
+                },
+                e_blooth_tag: {
+                    required: true,
+                    maxlength: 128
+                }
+            },
+            messages: {
+                e_device_name: {
+                    required: '请输入设备名称',
+                    maxlength: $.validator.format("请输入一个 长度最多是 {0} 的字符串")
+                },
+                e_hd_version: {
+                    required: '请输入硬件版本',
+                    maxlength: $.validator.format("请输入一个 长度最多是 {0} 的字符串")
+                },
+                e_blooth_tag: {
+                    required: '请输入蓝牙版本',
+                    maxlength: $.validator.format("请输入一个 长度最多是 {0} 的字符串")
+                }
+            }
+        });
+
+        var ok = device_edit_vt.form();
+        if(!ok){
+            return false;
+        }
+
+        var device_name = $('#e_device_name').val();
+        var hd_version = $('#e_hd_version').val();
+        var blooth_tag = $('#e_blooth_tag').val();
+        var scm_tag = $('#e_scm_tag').val();
+        var status = $('#e_status').val();
+        var serial_number = $('#e_serial_number').text();
+        var se_userid = window.localStorage.getItem('myid');
+
+        var post_data = {};
+        post_data['se_userid'] = se_userid;
+        post_data['serial_number'] = serial_number;
+        post_data['status'] = status;
+        post_data['scm_tag'] = scm_tag;
+        post_data['blooth_tag'] = blooth_tag;
+        post_data['hd_version'] = hd_version;
+        post_data['device_name'] = device_name;
+
+
+        $.ajax({
+            url: '/channel/v1/api/edit_device',
+            type: 'POST',
+            dataType: 'json',
+            data: post_data,
+            success: function(data) {
+                var respcd = data.respcd;
+                if(respcd != '0000'){
+                    var resperr = data.resperr;
+                    var respmsg = data.respmsg;
+                    var msg = resperr ? resperr : respmsg;
+                    toastr.warning(msg);
+                }
+                else {
+                    toastr.success('修改设备成功');
+                    $("#deviceEditModal").modal('hide');
                     $('#deviceList').DataTable().draw();
                 }
             },

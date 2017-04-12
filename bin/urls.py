@@ -62,6 +62,7 @@ urls = (
     #设备
     ('^/channel/v1/api/create_device$', device.DeviceCreateHandler),
     ('^/channel/v1/api/allocate_device$', device.DeviceAllocateHandler),
+    ('^/channel/v1/api/edit_device$', device.DeviceEditHandler),
 
     # 结算
     ('^/channel/v1/api/settle_list$', settle.SettleInfoHandler),
