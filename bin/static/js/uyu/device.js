@@ -93,7 +93,7 @@ $(document).ready(function(){
                     var scm_tag = full.scm_tag;
                     var is_valid = full.is_valid;
                     var allocate = '<input type="button" class="btn btn-primary btn-sm device-allocate" data-serial_number='+serial_number+' data-device_name='+device_name+' value=' + '分配' + '>';
-                    var edit = '<input type="button" class="btn btn-primary btn-sm device-edit" data-serial_number='+serial_number+' data-device_name='+device_name+ ' data-hd_version='+ hd_version +' data-blooth_tag='+ blooth_tag +' data-scm_tag='+scm_tag+'data-is_valid='+ is_valid +' value=' + '修改' + '>';
+                    var edit = '<input type="button" class="btn btn-primary btn-sm device-edit" data-serial_number='+serial_number+' data-device_name='+device_name+ ' data-hd_version='+ hd_version +' data-blooth_tag='+ blooth_tag +' data-scm_tag='+scm_tag+' data-is_valid='+ is_valid +' value=' + '修改' + '>';
                     return allocate + edit;
                 }
             }
