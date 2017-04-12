@@ -26,6 +26,17 @@ database = {
         'port': 3306,
         'conn': 5
     },
+    'uyu_old': {
+        'engine': 'pymysql',
+        'passwd': '123456',
+        'charset': 'utf8',
+        'db': 'uyu_old',
+        'idle_timeout': 60,
+        'host': '127.0.0.1',
+        'user': 'yyy',
+        'port': 3306,
+        'conn': 5
+    },
 }
 
 # web config
