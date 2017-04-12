@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import uuid
 import traceback
 from zbase.web import core
 from zbase.web import template

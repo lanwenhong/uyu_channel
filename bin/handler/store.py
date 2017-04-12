@@ -286,7 +286,6 @@ class StoreEyeHandler(core.Handler):
             params = self.validator.data
             uop = UUser()
             flag, err_code = uop.store_bind_eyesight(params["userid"], params["store_id"], params["channel_id"])
-            print 'flag', flag, 'err_code', err_code
             if flag:
                 return success({})
             else:
