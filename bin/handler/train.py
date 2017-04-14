@@ -253,6 +253,9 @@ class ChanBuyTrainingsOrderHandler(core.Handler):
         Field('remark', T_STR, True),
     ]
 
+    def _post_handler_errfunc(self, msg):
+        return error(UAURET.PARAMERR, respmsg=msg)
+
     @with_database('uyu_core')
     def _check_permission(self, params):
         channel_id = params["channel_id"]
@@ -312,6 +315,9 @@ class OrgAllotToChanOrderHandler(core.Handler):
         Field('ch_training_amt_per', T_INT, False),
     ]
 
+    def _post_handler_errfunc(self, msg):
+        return error(UAURET.PARAMERR, respmsg=msg)
+
     @with_database('uyu_core')
     def _check_permission(self, params):
         channel_id = params["channel_id"]
@@ -364,6 +370,9 @@ class ChannelAllotToStoreOrderHandler(core.Handler):
         Field('store_training_amt_per', T_INT, False),
         Field('remark', T_STR, True),
     ]
+
+    def _post_handler_errfunc(self, msg):
+        return error(UAURET.PARAMERR, respmsg=msg)
 
     @with_database('uyu_core')
     def _check_permission(self, params):
@@ -429,6 +438,9 @@ class OrderCancelHandler(core.Handler):
     _post_handler_fields = [
         Field("order_no", T_STR, False, match=r'^([0-9]{33})$'),
     ]
+
+    def _post_handler_errfunc(self, msg):
+        return error(UAURET.PARAMERR, respmsg=msg)
 
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self

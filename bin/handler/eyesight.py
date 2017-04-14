@@ -38,6 +38,9 @@ class EyeSightInfoHandler(core.Handler):
     def _get_handler_errfunc(self, msg):
         return error(UAURET.PARAMERR, respmsg=msg)
 
+    def _post_handler_errfunc(self, msg):
+        return error(UAURET.PARAMERR, respmsg=msg)
+
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_validator_self
     def _get_handler(self, *args):
@@ -114,6 +117,9 @@ class EyeRegisterHandler(core.Handler):
         Field('username', T_STR, False),
         Field('email', T_STR, True, match=r'^[a-zA-Z0-9_\-\'\.]+@[a-zA-Z0-9_]+(\.[a-z]+){1,2}$'),
     ]
+
+    def _post_handler_errfunc(self, msg):
+        return error(UAURET.PARAMERR, respmsg=msg)
 
 
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
