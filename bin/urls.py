@@ -16,7 +16,7 @@ urls = (
     # 总览页面
     ('^/channel/v1/page/overview.html$', overview.OverView),
     # 渠道页面
-    ('^/channel/v1/page/channel.html$', channel.ChannelManage),
+    # ('^/channel/v1/page/channel.html$', channel.ChannelManage),
     # 门店页面
     ('^/channel/v1/page/store.html$', store.StoreManage),
     # 设备页面
@@ -38,15 +38,15 @@ urls = (
 
     # 渠道API
     # 新建渠道接口
-    ('^/channel/v1/api/channel_create$', channel.CreateChanHandler),
+    # ('^/channel/v1/api/channel_create$', channel.CreateChanHandler),
     # 获取渠道信息和修改渠道信息接口
     ('^/channel/v1/api/channel$', channel.ChanHandler),
     # 设置渠道状态接口
-    ('^/channel/v1/api/channel_set_state', channel.ChanStateSetHandler),
+    # ('^/channel/v1/api/channel_set_state', channel.ChanStateSetHandler),
     # 获取渠道数据列表接口
-    ('^/channel/v1/api/chninfo_pagelist$', channel.ChannelInfoHandler),
+    # ('^/channel/v1/api/chninfo_pagelist$', channel.ChannelInfoHandler),
     # 获取有效渠道名称列表接口
-    ('^/channel/v1/api/chan_name_list$', channel.ChanNameList),
+    # ('^/channel/v1/api/chan_name_list$', channel.ChanNameList),
     # 获取渠道和对应门店名称列表接口
     ('^/channel/v1/api/chan_store_list$', channel.ChanStoreMap),
     # 渠道剩余点数
@@ -66,7 +66,7 @@ urls = (
     # 获取有效门店名称接口
     ('^/channel/v1/api/store_name_list$', store.StoreNameListHandler),
     # 获取渠道和门店数量统计接口
-    ('^/channel/v1/api/chan_store_total$', overview.OverViewInfoHandler),
+    # ('^/channel/v1/api/chan_store_total$', overview.OverViewInfoHandler),
 
     # 设备数据接口
     ('^/channel/v1/api/devinfo_pagelist$', device.DeviceInfoHandler),

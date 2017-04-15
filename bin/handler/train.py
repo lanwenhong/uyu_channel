@@ -269,6 +269,7 @@ class ChanBuyTrainingsOrderHandler(core.Handler):
         is_valid = channel_reocord["is_valid"]
 
         if is_valid == define.UYU_CHAN_STATUS_CLOSE:
+            log.debug('channel is_valid not match')
             return UYU_OP_ERR
 
         # if ch_training_amt_per != channel_reocord["training_amt_per"] or training_amt != training_times * ch_training_amt_per:
@@ -276,6 +277,7 @@ class ChanBuyTrainingsOrderHandler(core.Handler):
 
         if rule_id != 0 and rule_record:
             if training_amt != rule_record['total_amt'] or training_times != rule_record['training_times']:
+                log.debug('training_amt=%s or training_times=%s not match', training_amt, training_times)
                 return UYU_OP_ERR
 
         return UYU_OP_OK

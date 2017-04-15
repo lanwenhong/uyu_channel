@@ -1,294 +1,464 @@
 #coding: utf-8
 
+import json
+import hashlib
+import unittest
 from zbase.base import logger
 from zbase.base.http_client import RequestsClient
 from zbase.server.client import HttpClient
 
-import json
-
 log = logger.install('stdout')
 
+class TestUyuChannel(unittest.TestCase):
 
-def test_login():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"mobile": "15882895784", "password": "123456"}
-    #send = {"mobile": "18987867889", "password": "867889"}
-    ret = client.post('/channel_op/v1/api/login', send)
-    log.info(ret)
-    print client.client.headers
-
-
-def test_vcode():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"mobile": "15882895784"}
-    ret = client.post('/channel_op/v1/api/sms_send', send)
-    log.info(ret)
-
-def test_vcode_verify():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"mobile": "15882895784", "vcode":"3924", "password":"123456"}
-    ret = client.post('/channel_op/v1/api/passwd_change', send)
-    log.info(ret)
+    def setUp(self):
+        self.url = ''
+        self.send = {}
+        self.host = '127.0.0.1'
+        self.port = 8085
+        self.timeout = 2000
+        self.server = [{'addr':(self.host, self.port), 'timeout':self.timeout},]
+        self.client = HttpClient(self.server, client_class = RequestsClient)
+        self.headers = {'cookie': 'sessionid=4ef10ec5-d5c7-4637-b0eb-df9059f72fc8'}
 
 
+    @unittest.skip("skipping")
+    def test_login(self):
+        self.url = '/channel/v1/api/login'
+        self.send = {
+            "mobile": "13802438730",
+            "password": hashlib.md5("438730").hexdigest()
+        }
+        ret = self.client.post(self.url, self.send)
+        log.info(ret)
+        print '--headers--'
+        print self.client.client.headers
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
 
 
-def test_chn_query():
-    SERVER   = [{'addr':('127.0.0.1', 8084), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"userid": 1129, "se_userid": 1000}
-    headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-    ret = client.get('/channel_op/v1/api/channel', send, headers=headers)
-
-    log.debug(ret)
-
-
+    @unittest.skip("skipping")
+    def test_vcode(self):
+        self.url = '/channel/v1/api/sms_send'
+        self.send = {"mobile": "13802438730"}
+        ret = self.client.post(self.url, self.send)
+        log.info(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
 
 
-def test_chn_register():
-     SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-     client = HttpClient(SERVER, client_class = RequestsClient)
-     send = {
-        "se_userid": 1000,
-
-        "login_name": "14789897654",
-        "nick_name": "张四",
-        "phone_num": "14789897654",
-        "channel_name": "大中国四川成都牛逼大渠道",
-        "email": "lanwenhong@xxx.com",
-        "org_code": "xxxxxx1111111111",
-        "license_id": "xxxxxx11111111111",
-        "legal_person": "李四",
-        "business": "大富豪",
-        "front_business": "岁月",
-        "account_name": "天天",
-        "bank_name": "建设银行",
-        "bank_account": "78878878787878787878",
-        "contact_name": "天天",
-        "contact_phone": "15882895989",
-        "contact_email": "lanwenhong@xxxx.com",
-        "address": "成都天府新区",
-        "training_amt_per": 100,
-        "divide_percent": 0.45,
-        "is_prepayment": 0,
-     }
-     headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-     ret = client.post('/channel_op/v1/api/channel_create', send, headers=headers)
-     log.info(ret)
-
-def test_store_register():
-     SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-     client = HttpClient(SERVER, client_class = RequestsClient)
-     send = {
-        "se_userid": 1000,
-
-        "login_name": "13988887779",
-        "phone_num": "13988887779",
-        "channel_name": "大中国四川成都牛逼大渠道",
-        "email": "lanwenhong@xxx.com",
-        "org_code": "xxxxxx1111111111",
-        "license_id": "xxxxxx11111111111",
-        "legal_person": "李四",
-        "business": "大富豪",
-        "front_business": "岁月",
-        "account_name": "天天",
-        "bank_name": "建设银行",
-        "bank_account": "78878878787878787878",
-        "contact_name": "天天",
-        "contact_phone": "15882895989",
-        "contact_email": "lanwenhong@xxxx.com",
-        "address": "成都天府新区",
-
-        "training_amt_per": 100,
-        "divide_percent": 0.45,
-        "is_prepayment": 0,
-        "channel_id": 76,
-        "store_contacter": "王麻子",
-        "store_mobile": "13788887779",
-        "store_addr": "天府新区",
-        "store_name": "武大郎炊饼",
-        "store_type": 0,
-     }
-     headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-     ret = client.post('/channel_op/v1/api/store_create', send, headers=headers)
-     log.info(ret)
+    @unittest.skip("skipping")
+    def test_vcode_verify(self):
+        self.url = '/channel/v1/api/passwd_change'
+        self.send = {
+            "mobile": "13802438730",
+            "vcode":"0027",
+            "password": hashlib.md5("438730").hexdigest()
+        }
+        ret = self.client.post(self.url, self.send)
+        log.info(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
 
 
-def test_chn_change():
-     SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-     client = HttpClient(SERVER, client_class = RequestsClient)
-     send = {
-        "se_userid": 1000,
-        "userid": 1129,
+    @unittest.skip("skipping")
+    def test_store_register(self):
+         self.url = '/channel/v1/api/store_create'
+         self.send = {
+            "se_userid": 1560,
 
-        "login_name": "13788889999",
-        "nick_name": "张三",
-        "phone_num": "13788889999",
-        "email": "lanwenhong@xxx.com",
-        "org_code": "xxxxxx1111111111",
-        "license_id": "xxxxxx11111111111",
-        "legal_person": "李四",
-        "business": "大富豪",
-        "front_business": "岁月",
-        "account_name": "天天",
-        "bank_name": "建设银行",
-        "bank_account": "78878878787878787878",
-        "contact_name": "天天",
-        "contact_phone": "15882895989",
-        "contact_email": "lanwenhong@xxxx.com",
-        "address": "成都天府新区",
-        "training_amt_per": 30,
-        "divide_percent": 0.65,
-        "is_prepayment": 0,
-        "channel_name": "牛逼渠道",
-     }
-     headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-     ret = client.post('/channel_op/v1/api/channel', send, headers=headers)
-     log.info(ret)
+            "login_name": "13988888884",
+            "phone_num": "13988888884",
+            "channel_name": "门店8884",
+            "email": "sky@xxx.com",
+            "org_code": "xxxxxx1111111111",
+            "license_id": "xxxxxx11111111111",
+            "legal_person": "李四",
+            "business": "大富豪",
+            "front_business": "岁月",
+            "account_name": "天天",
+            "bank_name": "建设银行",
+            "bank_account": "78878878787878787878",
+            "contact_name": "天天",
+            "contact_phone": "15882895994",
+            "contact_email": "sky@xxxx.com",
+            "address": "成都天府新区",
 
-def test_store_change():
-     SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-     client = HttpClient(SERVER, client_class = RequestsClient)
-     send = {
-        "se_userid": 1000,
-        "userid": 1152,
-
-        "login_name": "13988887779",
-        "phone_num": "13988887779",
-        "channel_name": "大中国四川成都牛逼大渠道",
-        "email": "lanwenhong@xxx.com",
-        "org_code": "xxxxxx1111111111",
-        "license_id": "xxxxxx11111111111",
-        "legal_person": "李四",
-        "business": "大富豪",
-        "front_business": "岁月",
-        "account_name": "天天",
-        "bank_name": "建设银行",
-        "bank_account": "78878878787878787878",
-        "contact_name": "天天",
-        "contact_phone": "15882895989",
-        "contact_email": "lanwenhong@xxxx.com",
-        "address": "成都天府新区",
-
-        "training_amt_per": 100,
-        "divide_percent": 0.95,
-        "is_prepayment": 0,
-        "channel_id": 76,
-        "store_contacter": "王麻子",
-        "store_mobile": "13788887779",
-        "store_addr": "天府新区",
-        "store_name": "武大郎炊饼",
-        "store_type": 0,
-     }
-     headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-     ret = client.post('/channel_op/v1/api/store', send, headers=headers)
-     log.info(ret)
+            "training_amt_per": 100,
+            "divide_percent": 0.45,
+            "is_prepayment": 0,
+            "store_contacter": "张三",
+            "store_mobile": "15882895994",
+            "store_addr": "天府新区",
+            "store_name": "SkyStore",
+            "store_type": 0,
+         }
+         ret = self.client.post(self.url, self.send, headers=self.headers)
+         log.info(ret)
+         respcd = json.loads(ret).get('respcd')
+         self.assertEqual(respcd, '0000')
 
 
-def test_chan_set_state():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"se_userid": 1000, "userid": 1128, "state": 1}
+    @unittest.skip("skipping")
+    def test_store_change(self):
+         self.url = '/channel/v1/api/store'
+         self.send = {
+            "se_userid": 1560,
+            "userid": 51568,
 
-    headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-    ret = client.post('/channel_op/v1/api/channel_set_state', send, headers=headers)
-    log.debug(ret)
+            "login_name": "13988888884",
+            "phone_num": "13988888884",
+            "channel_name": "大中国四川成都牛逼大渠道",
+            "email": "lanwenhong@xxx.com",
+            "org_code": "xxxxxx1111111111",
+            "license_id": "xxxxxx11111111111",
+            "legal_person": "李四",
+            "business": "大富豪",
+            "front_business": "岁月",
+            "account_name": "天天",
+            "bank_name": "建设银行",
+            "bank_account": "78878878787878787878",
+            "contact_name": "天天",
+            "contact_phone": "15882895994",
+            "contact_email": "lanwenhong@xxxx.com",
+            "address": "成都天府新区",
 
-def test_store_set_state():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"se_userid": 1000, "userid": 1152, "state": 0}
-
-    headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-    ret = client.post('/channel_op/v1/api/store_set_state', send, headers=headers)
-    log.debug(ret)
-
-
-
-def test_store_query():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"userid": 1152, "se_userid": 1000}
-    headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-    ret = client.get('/channel_op/v1/api/store', send, headers=headers)
-    log.debug(ret)
-
-
-def test_channel_name_list():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"se_userid": 1000}
-    headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-    ret = client.get('/channel_op/v1/api/chan_name_list', send, headers=headers)
-    log.debug(ret)
-
-def test_store_name_list():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"se_userid": 1000}
-    headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-    ret = client.get('/channel_op/v1/api/store_name_list', send, headers=headers)
-    log.debug(ret)
+            "training_amt_per": 100,
+            "divide_percent": 0.95,
+            "is_prepayment": 0,
+            "store_contacter": "王麻子",
+            "store_mobile": "15882895994",
+            "store_addr": "天府新区",
+            "store_name": "SkyCook@",
+            "store_type": 0,
+         }
+         ret = self.client.post(self.url, self.send, headers=self.headers)
+         log.info(ret)
+         respcd = json.loads(ret).get('respcd')
+         self.assertEqual(respcd, '0000')
 
 
-def chan_buy_order():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"se_userid": 1000, "busicd": "000010", "channel_id": 37, "training_times": 19, "training_amt": 19, 'ch_training_amt_per': 1}
+    @unittest.skip("skipping")
+    def test_store_list(self):
+        self.url = '/channel/v1/api/storeinfo_pagelist'
+        self.send = {
+            "se_userid": 1560,
+            "page": 1,
+            "maxnum": 10,
+            # "channel_name": "",
+            # "store_name": "",
+            # "is_valid": 0
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
 
 
-    headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-    ret = client.post("/channel_op/v1/api/chan_buy_order", send, headers=headers)
+    @unittest.skip("skipping")
+    def test_device_list(self):
+        self.url = '/channel/v1/api/devinfo_pagelist'
+        self.send = {
+            "se_userid": 1560,
+            "page": 1,
+            "maxnum": 10,
+            # "store_name": "",
+            # "serial_number": "",
+            # "status": 0
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
 
 
-def org_allot_to_chan_order():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"se_userid": 1000, "busicd": "ORG_ALLOT_TO_CHAN", "channel_id": 83, "training_times": 19, "training_amt": 19 * 1000, 'ch_training_amt_per': 1000}
-
-    headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-    ret = client.post("/channel_op/v1/api/org_allot_to_chan_order", send, headers=headers)
-
-    s = json.loads(ret)
-
-    log.debug(s["resperr"])
-
-def org_allot_to_store_order():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"se_userid": 1000, "busicd": "CHAN_ALLOT_TO_STORE", "channel_id": 83, "store_id": 40, "training_times": 18, "training_amt": 18 * 1230, 'store_training_amt_per': 1230}
-
-    headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-    ret = client.post("/channel_op/v1/api/org_allot_to_store_order", send, headers=headers)
+    @unittest.skip("skipping")
+    def test_store_set_state(self):
+        self.url = '/channel/v1/api/store_set_state'
+        self.send = {"se_userid": 1560, "userid": 51568, "state": 1}
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
 
 
-def order_cancel_test():
-    SERVER   = [{'addr':('127.0.0.1', 8083), 'timeout':20},]
-    client = HttpClient(SERVER, client_class = RequestsClient)
-    send = {"se_userid": 1000, "order_no": "201703141732116247348413348818118"}
+    @unittest.skip("skipping")
+    def test_store_query(self):
+        self.url = '/channel/v1/api/store'
+        self.send = {"userid": 51568, "se_userid": 1560}
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
 
-    headers = {'cookie': 'sessionid=85aeb24b-04ba-47ed-975b-ba763fc1b2a4'}
-    ret = client.post("/channel_op/v1/api/order_cancel", send, headers=headers)
-    log.debug(ret)
 
-if __name__ == '__main__':
-    #test_login()
-    #test_vcode()
-    #test_vcode_verify()
-    #test_chn_register()
-    #test_chn_query()
-    #test_chn_change()
-    #test_chan_set_state()
-    #test_store_register()
-    #test_store_query()
-    #test_store_change()
-    #test_store_set_state()
-    #test_channel_name_list()
-    #test_store_name_list()
-    #chan_buy_order()
-    #org_allot_to_chan_order()
-    org_allot_to_store_order()
-    #order_cancel_test()
+    @unittest.skip("skipping")
+    def test_bind_eyesight(self):
+        self.url = '/channel/v1/api/store_eye'
+        self.send = {
+            "userid": 1228,
+            "store_id": 81,
+            "channel_id": 102,
+            "se_userid": 1560
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_query_eyesight_info(self):
+        self.url = '/channel/v1/api/store_eye'
+        self.send = {
+            "se_userid": 1560,
+            "phone_num": "13475481266"
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_channel_store_map(self):
+        self.url = '/channel/v1/api/chan_store_list'
+        self.send = {
+            "se_userid": 1560,
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_store_name_list(self):
+        self.url = '/channel/v1/api/store_name_list'
+        self.send = {"se_userid": 1560}
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_chan_buy_order(self):
+        self.url = "/channel/v1/api/channel_buy_order"
+        self.send = {
+            "se_userid": 1560,
+            "busicd": "CHAN_BUY",
+            "channel_id": 102,
+            "rule_id": 1,
+            "training_times": 500,
+            "training_amt": 2000000,
+            'ch_training_amt_per': 2243
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_chan_allot_to_store_order(self):
+        self.url = "/channel/v1/api/channel_allot_to_store_order"
+        self.send = {
+            "se_userid": 1560,
+            "busicd": "CHAN_ALLOT_TO_STORE",
+            "store_id": 81,
+            "training_times": 100,
+            "training_amt": 100*100,
+            "store_training_amt_per": 100,
+            "remark": "给门店81分配100次",
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        respcd = json.loads(ret).get('respcd')
+
+
+
+    @unittest.skip("skipping")
+    def test_order_cancel(self):
+        self.url = "/channel/v1/api/order_cancel"
+        self.send = {
+            "se_userid": 1560,
+            "order_no": "2017041501586144"
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_create_device(self):
+        self.url = "/channel/v1/api/create_device"
+        self.send = {
+            "se_userid": 1560,
+            "device_name": "设备_0415",
+            "hd_version": "hd_v1",
+            "blooth_tag": "bt_v1",
+            "scm_tag": "sm_v1",
+            "status": 0,
+            "store_id": 81
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_allocate_device(self):
+        self.url = "/channel/v1/api/allocate_device"
+        self.send = {
+            "se_userid": 1560,
+            "serial_number": 146,
+            "channel_id": 102,
+            "store_id": 80
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_edit_device(self):
+        self.url = "/channel/v1/api/edit_device"
+        self.send = {
+            "se_userid": 1560,
+            "device_name": "设备_0415",
+            "hd_version": "hd_v1.1.5",
+            "blooth_tag": "bt_v1.1.5",
+            "scm_tag": "sm_v1.1.5",
+            "status": 0,
+            "serial_number": 146
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+
+    @unittest.skip("skipping")
+    def test_settle_list(self):
+        self.url = "/channel/v1/api/settle_list"
+        self.send = {
+            "se_userid": 1560,
+            "page": 1,
+            "maxnum": 10,
+            # "start_time": "",
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_train_op_list(self):
+        self.url = "/channel/v1/api/training_op_list"
+        self.send = {
+            "se_userid": 1560,
+            "page": 1,
+            "maxnum": 10,
+            # "op_type": 0,
+            # "start_time": "",
+            # "end_time": "",
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_train_use_list(self):
+        self.url = "/channel/v1/api/training_use_list"
+        self.send = {
+            "se_userid": 1560,
+            "page": 1,
+            "maxnum": 10,
+            # "store_name": "",
+            # "consumer_id": "",
+            # "eyesight": "",
+            # "create_time": "",
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+
+    @unittest.skip("skipping")
+    def test_rules_list(self):
+        self.url = "/channel/v1/api/rules_list"
+        self.send = {
+            "se_userid": 1560,
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_store_bind_eyesight_info_list(self):
+        self.url = "/channel/v1/api/eyesight_info"
+        self.send = {
+            "se_userid": 1560,
+            "channel_id": 102,
+            "store_id": 81,
+            "userid": 51564  # 无用单接口需要传
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_store_unbind_eyesight(self):
+        self.url = "/channel/v1/api/eyesight_info"
+        self.send = {
+            "se_userid": 1560,
+            "channel_id": 102,
+            "store_id": 81,
+            "userid": 1228 #需要解绑的视光师userid
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    @unittest.skip("skipping")
+    def test_register_eyesight(self):
+        self.url = "/channel/v1/api/register_eye"
+        self.send = {
+            "se_userid": 1560,
+            "mobile": "13928478193",
+            "nick_name": "视光师8193",
+            "username": "blue",
+            "email": "blue@ccc.com"
+        }
+        ret = self.client.post(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+
+    #@unittest.skip("skipping")
+    def test_remain_times(self):
+        self.url = "/channel/v1/api/remain_times"
+        self.send = {
+            "se_userid": 1560,
+        }
+        ret = self.client.get(self.url, self.send, headers=self.headers)
+        log.debug(ret)
+        respcd = json.loads(ret).get('respcd')
+        self.assertEqual(respcd, '0000')
+
+suite = unittest.TestLoader().loadTestsFromTestCase(TestUyuChannel)
+unittest.TextTestRunner(verbosity=2).run(suite)
