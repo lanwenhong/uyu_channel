@@ -92,7 +92,8 @@ $(document).ready(function(){
                     var blooth_tag = full.blooth_tag;
                     var scm_tag = full.scm_tag;
                     var is_valid = full.is_valid;
-                    var allocate = '<input type="button" class="btn btn-primary btn-sm device-allocate" data-serial_number='+serial_number+' data-device_name='+device_name+' value=' + '分配' + '>';
+                    var store_id = full.store_id;
+                    var allocate = '<input type="button" class="btn btn-primary btn-sm device-allocate" data-serial_number='+serial_number+' data-device_name='+device_name+ ' data-store_id='+ store_id +' value=' + '分配' + '>';
                     var edit = '<input type="button" class="btn btn-primary btn-sm device-edit" data-serial_number='+serial_number+' data-device_name='+device_name+ ' data-hd_version='+ hd_version +' data-blooth_tag='+ blooth_tag +' data-scm_tag='+scm_tag+' data-is_valid='+ is_valid +' value=' + '修改' + '>';
                     return allocate + edit;
                 }
@@ -126,7 +127,7 @@ $(document).ready(function(){
 
     $("#deviceCreate").click(function(){
         $("#deviceCreateForm").resetForm();
-        do_first_select('#store_name');
+        do_first_select('#store_name', '');
         $("label.error").remove();
         $("#deviceCreateModal").modal();
     });
@@ -250,11 +251,11 @@ $(document).ready(function(){
         $('#a_store_name').html('');
         var device_name = $(this).data('device_name');
         var serial_number = $(this).data('serial_number');
-
+        var store_id = $(this).data('store_id');
         $('#deviceAllocateForm').resetForm();
         $('#a_device_name').val(device_name);
         $('#a_serial_number').val(serial_number);
-        do_first_select('#a_store_name');
+        do_first_select('#a_store_name', store_id);
         $('#deviceAllocate').modal();
     });
 
@@ -432,7 +433,7 @@ $(document).ready(function(){
 });
 
 
-function do_first_select(store_name_tag_id) {
+function do_first_select(store_name_tag_id, record_store_id) {
     $(store_name_tag_id).html('');
     var get_data = {};
     var se_userid = window.localStorage.getItem('myid');
@@ -459,6 +460,9 @@ function do_first_select(store_name_tag_id) {
                     var store_name = data.data[i].store_name;
                     var option_str = $('<option value='+store_id+'>'+store_name+'</option>');
                     option_str.appendTo(c_store_name);
+                }
+                if(record_store_id){
+                    $(store_name_tag_id).val(record_store_id);
                 }
             }
         },
