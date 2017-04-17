@@ -1,5 +1,11 @@
 $(document).ready(function(){
 
+
+    var channel_is_prepayment = window.localStorage.getItem('is_prepayment');
+    if(channel_is_prepayment == 1){
+        $("#training_buyer").attr('disabled', true);
+    }
+
     get_remain_times();
 
     $.validator.addMethod("PositiveNumber", function(value, element, param) {
@@ -279,6 +285,7 @@ $(document).ready(function(){
     $("#training_allocate").click(function () {
         $("#trainAllocateCreateForm").resetForm();
         $("label.error").remove();
+        $("#store_name").html('');
 
         var get_data = {};
         var se_userid = window.localStorage.getItem('myid');
