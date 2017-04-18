@@ -167,6 +167,31 @@ $(document).ready(function(){
     });
 
     $("#storeSearch").click(function(){
+        var store_query_vt = $('#store_query').validate({
+            rules: {
+                q_store_name: {
+                    required: false,
+                    maxlength: 256
+                }
+            },
+            messages: {
+                q_store_name: {
+                    required: '请输入门店名称',
+                    maxlength: $.validator.format("请输入一个长度最多是 {0} 的字符串")
+                }
+            },
+            errorPlacement: function(error, element){
+                var $error_element = element.parent().parent().next();
+                $error_element.text('');
+                error.appendTo($error_element);
+            }
+        });
+        var ok = store_query_vt.form();
+        if(!ok){
+            $("#query_label_error").show();
+            $("#query_label_error").fadeOut(1400);
+            return false;
+        }
         $('#storeList').DataTable().draw();
     });
 
