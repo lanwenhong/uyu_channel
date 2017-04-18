@@ -384,6 +384,7 @@ $(document).ready(function(){
                     toastr.success('新建成功');
                     $("#storeCreateForm").resetForm();
                     $("#storeCreateModal").modal('hide');
+                    location.reload();
                     $('#storeList').DataTable().draw();
                 }
 	        },
