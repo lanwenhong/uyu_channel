@@ -203,13 +203,33 @@ class StoreHandler(core.Handler):
             return error(UAURET.SESSIONERR)
         uop = UUser()
         params = self.validator.data
+        # self.user.userid是当前登录渠道userid
         uop.call('load_info_by_userid', self.user.userid)
         channel_id = uop.cdata['chnid']
 
+        # 参数里的userid是修改门店的id
+        store_userid = params['userid']
+        uop.load_info_by_userid(store_userid)
+        origin_store_is_prepayment = uop.sdata['is_prepayment']
+        remain_times = uop.sdata['remain_times']
+
         store_is_prepayment = params['is_prepayment']
         channel_is_prepayment = self._can_modify(channel_id)
-        if channel_is_prepayment != store_is_prepayment and channel_is_prepayment == define.UYU_CHAN_DIV_TYPE:
-            return error(UAURET.CHANGESTOREERR)
+
+        log.debug("channel_id: %d store_is_prepayment: %d origin_store_is_prepayment: %d", channel_id, store_is_prepayment, origin_store_is_prepayment)
+        # if channel_is_prepayment != store_is_prepayment and channel_is_prepayment == define.UYU_CHAN_DIV_TYPE:
+        #     return error(UAURET.CHANGESTOREERR)
+
+        if store_is_prepayment == origin_store_is_prepayment:
+            log.debug("not change channel and store type not change pass!!!")
+            pass
+        else:
+            if channel_is_prepayment == define.UYU_CHAN_DIV_TYPE and store_is_prepayment != define.UYU_STORE_DIV_TYPE:
+                return error(UAURET.STOREERR1)
+
+            if remain_times <= 0 and store_is_prepayment == define.UYU_STORE_PREPAY_TYPE:
+                return error(UAURET.STOREERR1)
+
 
         params['login_name'] = params['phone_num']
         udata = {}
