@@ -19,7 +19,7 @@ class TestUyuChannel(unittest.TestCase):
         self.timeout = 2000
         self.server = [{'addr':(self.host, self.port), 'timeout':self.timeout},]
         self.client = HttpClient(self.server, client_class = RequestsClient)
-        self.headers = {'cookie': 'sessionid=4ef10ec5-d5c7-4637-b0eb-df9059f72fc8'}
+        self.headers = {'cookie': 'sessionid=532a46c8-ed73-448c-b01a-b28229772dbf'}
 
 
     @unittest.skip("skipping")
@@ -191,11 +191,13 @@ class TestUyuChannel(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    @unittest.skip("skipping")
+    #@unittest.skip("skipping")
     def test_bind_eyesight(self):
         self.url = '/channel/v1/api/store_eye'
         self.send = {
-            "userid": 1228,
+            # "userid": 1230,   #视光师傅
+            # "userid": 1268,   #消费者
+            "userid": 1197,   #门店
             "store_id": 81,
             "channel_id": 102,
             "se_userid": 1560
@@ -211,7 +213,9 @@ class TestUyuChannel(unittest.TestCase):
         self.url = '/channel/v1/api/store_eye'
         self.send = {
             "se_userid": 1560,
-            "phone_num": "13475481266"
+            # "phone_num": "13475481268"  # 视光师
+            # "phone_num": "13802438718"  # 消费者
+            "phone_num": "13000000003"  # 门店
         }
         ret = self.client.get(self.url, self.send, headers=self.headers)
         log.debug(ret)
@@ -449,7 +453,7 @@ class TestUyuChannel(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    #@unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_remain_times(self):
         self.url = "/channel/v1/api/remain_times"
         self.send = {
