@@ -395,7 +395,9 @@ class ChannelAllotToStoreOrderHandler(core.Handler):
             log.warn("s_is_valid: %d c_is_valid: %d", s_is_valid, c_is_valid)
             return UYU_OP_ERR
 
-        if store_training_amt_per != store_record["training_amt_per"] or training_amt != training_times * store_training_amt_per:
+        # if store_training_amt_per != store_record["training_amt_per"] or training_amt != training_times * store_training_amt_per:
+        # 总金额变成了手动输入大于0
+        if store_training_amt_per != store_record["training_amt_per"] or training_amt <= 0:
             log.warn("store_training_amt_per: %d in db: %d", store_training_amt_per, store_record["training_amt_per"])
             return UYU_OP_ERR
 
