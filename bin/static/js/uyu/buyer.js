@@ -8,7 +8,7 @@ $(document).ready(function(){
 
     get_remain_times();
 
-    $.validator.addMethod("PositiveNumber", function(value, element, param) {
+    $.validator.addMethod("CheckTrainingTimes", function(value, element, param) {
         var customMsg = '';
         var result = true;
         var remain_times = parseInt($("#remain_times").text());
@@ -30,9 +30,16 @@ $(document).ready(function(){
                 }
             }
         }
-        $.validator.messages.PositiveNumber = customMsg;
+        $.validator.messages.CheckTrainingTimes = customMsg;
         return result;
     });
+
+
+    $.validator.addMethod("CheckMoney", function(value, element) {
+        var length = value.length;
+        var money = /^[0-9]+(.[0-9]{1,2})?$/;
+        return this.optional(element) || (length && money.test(value) && parseFloat(value) > 0);
+    }, "请正确填写您的总金额");
 
     /*
     $("#training_times").bind('input propertychange', function () {
@@ -42,10 +49,12 @@ $(document).ready(function(){
     });
     */
 
+    /*
     $("#a_training_times").bind('input propertychange', function () {
         var amount_per = $('#a_store_training_amt_per').val();
         $('#a_training_amt').val(($(this).val() * amount_per).toFixed(2));
     });
+    */
 
     $.validator.addMethod("isYuan", function(value, element) {
         var length = value.length;
@@ -213,7 +222,7 @@ $(document).ready(function(){
                     required: true,
                     //range:[10, 100],
                     digits: true,
-                    //PositiveNumber: "#training_times"
+                    //CheckTrainingTimes: "#training_times"
                 },
                 remark: {
                     required: false,
@@ -445,21 +454,27 @@ $(document).ready(function(){
                     required: true,
                     //range:[1, remain_times],
                     digits: true,
-                    PositiveNumber: "#a_training_times"
+                    CheckTrainingTimes: "#a_training_times"
                 },
                 remark: {
                     required: false,
                     maxlength: 256
+                },
+                a_training_amt: {
+                    required: true,
+                    CheckMoney: "#a_training_amt"
                 }
             },
             messages: {
                 training_times: {
                     required: '请输入分配的训练次数',
-                    digits: "只能输入整数",
-                    //range: $.validator.format("请输入一个介于 {0} 和 {1} 之间的值")
+                    digits: "只能输入整数"
                 },
                 remark: {
                     maxlength: $.validator.format("请输入一个长度最多是 {0} 的字符")
+                },
+                a_training_amt: {
+                    required: '请输入总金额'
                 }
             }
         });
