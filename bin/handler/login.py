@@ -51,7 +51,7 @@ class ChangePassHandler(core.Handler):
         user_type = u_op.udata.get('user_type')
         if user_type != define.UYU_USER_ROLE_CHAN:
             log.debug('change password handler mobile=%s user_type=%s not channel', mobile, user_type)
-            return error(UAURET.USERROLEERR)
+            return error(UAURET.ROLEERR)
 
         respcd = u_op.change_password(mobile, vcode, password)
         if respcd != UAURET.OK:
@@ -127,7 +127,7 @@ class SmsHandler(core.Handler):
         user_type = uop.udata.get('user_type')
         if user_type != define.UYU_USER_ROLE_CHAN:
             log.debug('sms handler mobile=%s user_type=%s not channel', mobile, user_type)
-            return error(UAURET.USERROLEERR)
+            return error(UAURET.ROLEERR)
 
         vop = VCode()
         vcode = vop.gen_vcode(mobile)
