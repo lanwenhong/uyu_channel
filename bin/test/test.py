@@ -40,20 +40,20 @@ class TestUyuChannel(unittest.TestCase):
     @unittest.skip("skipping")
     def test_vcode(self):
         self.url = '/channel/v1/api/sms_send'
-        self.send = {"mobile": "13802438730"}
+        self.send = {"mobile": "18215630018"}
         ret = self.client.post(self.url, self.send)
         log.info(ret)
         respcd = json.loads(ret).get('respcd')
         self.assertEqual(respcd, '0000')
 
 
-    @unittest.skip("skipping")
+    #@unittest.skip("skipping")
     def test_vcode_verify(self):
         self.url = '/channel/v1/api/passwd_change'
         self.send = {
-            "mobile": "13802438730",
-            "vcode":"0027",
-            "password": hashlib.md5("438730").hexdigest()
+            "mobile": "18215630018",
+            "vcode":"1572",
+            "password": hashlib.md5("12345678").hexdigest()
         }
         ret = self.client.post(self.url, self.send)
         log.info(ret)
@@ -437,7 +437,7 @@ class TestUyuChannel(unittest.TestCase):
         self.assertEqual(respcd, '0000')
 
 
-    #@unittest.skip("skipping")
+    @unittest.skip("skipping")
     def test_register_eyesight(self):
         self.url = "/channel/v1/api/register_eye"
         self.send = {

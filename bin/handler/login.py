@@ -43,6 +43,16 @@ class ChangePassHandler(core.Handler):
         password = params["password"]
 
         u_op = UUser()
+        u_op.load_user_by_mobile(mobile)
+        if len(u_op.udata) == 0:
+            log.debug('change password handler mobile=%s not exists', mobile)
+            return error(UAURET.USERERR)
+
+        user_type = u_op.udata.get('user_type')
+        if user_type != define.UYU_USER_ROLE_CHAN:
+            log.debug('change password handler mobile=%s user_type=%s not channel', mobile, user_type)
+            return error(UAURET.USERROLEERR)
+
         respcd = u_op.change_password(mobile, vcode, password)
         if respcd != UAURET.OK:
             return error(respcd)
@@ -111,6 +121,12 @@ class SmsHandler(core.Handler):
         uop = UUser()
         uop.load_user_by_mobile(mobile)
         if len(uop.udata) == 0:
+            log.debug('sms handler mobile=%s not exists', mobile)
+            return error(UAURET.USERERR)
+
+        user_type = uop.udata.get('user_type')
+        if user_type != define.UYU_USER_ROLE_CHAN:
+            log.debug('sms handler mobile=%s user_type=%s not channel', mobile, user_type)
             return error(UAURET.USERROLEERR)
 
         vop = VCode()
