@@ -8,6 +8,12 @@ def gen_ret_range(page, maxnum):
     return start, end
 
 
+def gen_offset(page, maxnum):
+     limit = maxnum
+     offset = (page -1) * maxnum
+     return offset, limit
+
+
 def channel_name_to_id(name):
     data = []
     with get_connection_exception('uyu_core') as conn:

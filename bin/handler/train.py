@@ -63,11 +63,12 @@ class TrainBuyInfoHandler(core.Handler):
             uop.call('load_info_by_userid', self.user.userid)
             self.channel_id = uop.cdata['chnid']
 
-            start, end = tools.gen_ret_range(curr_page, max_page_num)
-            info_data = self._query_handler(op_type, start_time, end_time)
+            # start, end = tools.gen_ret_range(curr_page, max_page_num)
+            offset, limit = tools.gen_offset(curr_page, max_page_num)
+            info_data = self._query_handler(offset, limit, op_type, start_time, end_time)
 
-            data['info'] = self._trans_record(info_data[start:end])
-            data['num'] = len(info_data)
+            data['info'] = self._trans_record(info_data)
+            data['num'] = self._total_stat()
             return success(data)
         except Exception as e:
             log.warn(e)
@@ -76,7 +77,14 @@ class TrainBuyInfoHandler(core.Handler):
 
 
     @with_database('uyu_core')
-    def _query_handler(self, op_type=None, start_time=None, end_time=None):
+    def _total_stat(self):
+        sql = 'select count(*) as total from training_operator_record where create_time>0'
+        ret = self.db.get(sql)
+        return int(ret['total']) if ret['total'] else 0
+
+
+    @with_database('uyu_core')
+    def _query_handler(self, offset, limit, op_type=None, start_time=None, end_time=None):
         where = {'channel_id': self.channel_id}
 
         if start_time and end_time:
@@ -87,7 +95,7 @@ class TrainBuyInfoHandler(core.Handler):
         if op_type in (0, 1):
             where.update({'op_type': op_type})
 
-        other = ' order by create_time desc'
+        other = ' order by create_time desc limit %d offset %d' % (limit, offset)
 
         keep_fields = [
             'id', 'channel_id', 'store_id',
@@ -168,18 +176,27 @@ class TrainUseInfoHandler(core.Handler):
             uop.call('load_info_by_userid', self.user.userid)
             self.channel_id = uop.cdata['chnid']
 
-            start, end = tools.gen_ret_range(curr_page, max_page_num)
-            info_data = self._query_handler(store_name, consumer_id, eyesight, create_time)
-            data['info'] = self._trans_record(info_data[start:end])
-            data['num'] = len(info_data)
+            # start, end = tools.gen_ret_range(curr_page, max_page_num)
+            offset, limit = tools.gen_offset(curr_page, max_page_num)
+            info_data = self._query_handler(offset, limit, store_name, consumer_id, eyesight, create_time)
+            data['info'] = self._trans_record(info_data)
+            data['num'] = self._total_stat()
             return success(data)
         except Exception as e:
             log.warn(e)
             log.warn(traceback.format_exc())
             return error(UAURET.DATAERR)
 
+
     @with_database('uyu_core')
-    def _query_handler(self, store_name=None, consumer_id=None, eyesight=None, create_time=None):
+    def _total_stat(self):
+        sql = 'select count(*) as total from training_use_record where ctime>0'
+        ret = self.db.get(sql)
+        return int(ret['total']) if ret['total'] else 0
+
+
+    @with_database('uyu_core')
+    def _query_handler(self, offset, limit, store_name=None, consumer_id=None, eyesight=None, create_time=None):
         where = {'channel_id': self.channel_id}
 
         if store_name:
@@ -205,7 +222,7 @@ class TrainUseInfoHandler(core.Handler):
             end_time = create_time.replace(hour=23, minute=59, second=59)
             where.update({'ctime': ('between', (start_time, end_time))})
 
-        other = ' order by ctime desc'
+        other = ' order by ctime desc limit %d offset %d' % (limit, offset)
 
         keep_fields = ['id', 'channel_id', 'store_id', 'device_id', 'consumer_id', 'eyesight_id', 'comsumer_nums', 'status', 'ctime']
 

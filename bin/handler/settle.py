@@ -52,22 +52,31 @@ class SettleInfoHandler(core.Handler):
             uop.call('load_info_by_userid', self.user.userid)
             self.channel_id = uop.cdata['chnid']
 
-            start, end = tools.gen_ret_range(curr_page, max_page_num)
-            info_data = self._query_handler(start_time)
+            # start, end = tools.gen_ret_range(curr_page, max_page_num)
+            offset, limit = tools.gen_offset(curr_page, max_page_num)
+            info_data = self._query_handler(offset, limit, start_time)
 
-            data['info'] = self._trans_record(info_data[start:end])
-            data['num'] = len(info_data)
+            data['info'] = self._trans_record(info_data)
+            data['num'] = self._total_stat()
             return success(data)
         except Exception as e:
             log.warn(traceback.format_exc())
             return error(UAURET.DATAERR)
 
+
     @with_database('uyu_core')
-    def _query_handler(self, start_time=None):
+    def _total_stat(self):
+        sql = 'select count(*) as total from settlement_record where ctime>0'
+        ret = self.db.get(sql)
+        return int(ret['total']) if ret['total'] else 0
+
+
+    @with_database('uyu_core')
+    def _query_handler(self, offset, limit, start_time=None):
 
         keep_fields = '*'
         where = {'channel_id': self.channel_id}
-        other = ' order by settle_cycle desc '
+        other = ' order by settle_cycle desc limit %d offset %d' % (limit, offset)
 
         if start_time:
             year_month = start_time.split('-')

@@ -54,19 +54,28 @@ class DeviceInfoHandler(core.Handler):
             self.user.load_channel()
             self.user.channel_id = self.user.cdata['id']
 
-            start, end = tools.gen_ret_range(curr_page, max_page_num)
-            info_data = self._query_handler(store_name, serial_number, status)
+            # start, end = tools.gen_ret_range(curr_page, max_page_num)
+            offset, limit = tools.gen_offset(curr_page, max_page_num)
+            info_data = self._query_handler(offset, limit, store_name, serial_number, status)
 
-            data['info'] = self._trans_record(info_data[start:end])
-            data['num'] = len(info_data)
+            data['info'] = self._trans_record(info_data)
+            data['num'] = self._total_stat()
             return success(data)
         except Exception as e:
             log.warn(e)
             log.warn(traceback.format_exc())
             return error(UAURET.DATAERR)
 
+
     @with_database('uyu_core')
-    def _query_handler(self, store_name=None, serial_number=None, status=None):
+    def _total_stat(self):
+        sql = 'select count(*) as total from device where ctime>0'
+        ret = self.db.get(sql)
+        return int(ret['total']) if ret['total'] else 0
+
+
+    @with_database('uyu_core')
+    def _query_handler(self, offset, limit, store_name=None, serial_number=None, status=None):
         where = {'channel_id': self.user.channel_id}
 
         keep_fields = [
@@ -75,7 +84,7 @@ class DeviceInfoHandler(core.Handler):
             'training_nums', 'ctime'
         ]
 
-        other = ' order by ctime desc'
+        other = ' order by ctime desc limit %d offset %d' % (limit, offset)
 
         if store_name:
             store_list = tools.store_name_to_id(store_name)
