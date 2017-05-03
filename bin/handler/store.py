@@ -47,6 +47,7 @@ class StoreStateSetHandler(core.Handler):
         return success({})
 
     def POST(self, *args):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         ret = self._post_handler()
         self.write(ret)
 
@@ -140,6 +141,7 @@ class StoreInfoHandler(core.Handler):
 
     def GET(self):
         try:
+            self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
             data = self._get_handler()
             return data
         except Exception as e:
@@ -256,6 +258,7 @@ class StoreHandler(core.Handler):
         return success({"userid": params["userid"]})
 
     def POST(self):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         return self._post_handler()
 
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
@@ -286,6 +289,7 @@ class StoreHandler(core.Handler):
         return success(data)
 
     def GET(self, *args):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         return self._get_handler()
 
 
@@ -328,6 +332,7 @@ class StoreEyeHandler(core.Handler):
         return success(ret)
 
     def GET(self, *args):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         return self._get_handler()
 
     @with_validator_self
@@ -346,6 +351,7 @@ class StoreEyeHandler(core.Handler):
             return error(UAURET.DATAEXIST)
 
     def POST(self, *arg):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         return self._post_handler()
 
 
@@ -426,6 +432,7 @@ class CreateStoreHandler(core.Handler):
         return success({"userid": uop.userid, "chnid": uop.chnid, "store_id": uop.store_id})
 
     def POST(self, *args):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         ret = self._post_handler()
         self.write(ret)
 
@@ -436,6 +443,7 @@ class StoreNameListHandler(core.Handler):
     @uyu_check_session(g_rt.redis_pool, cookie_conf, UYU_SYS_ROLE_CHAN)
     @with_database('uyu_core')
     def GET(self):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         if not self.user.sauth:
             return error(UAURET.SESSIONERR)
 

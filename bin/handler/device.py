@@ -114,6 +114,7 @@ class DeviceInfoHandler(core.Handler):
 
     def GET(self):
         try:
+            self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
             data = self._get_handler()
             return data
         except Exception as e:
@@ -160,6 +161,7 @@ class DeviceCreateHandler(core.Handler):
         return success({})
 
     def POST(self, *args):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         ret = self._post_handler()
         self.write(ret)
 
@@ -194,6 +196,7 @@ class DeviceAllocateHandler(core.Handler):
         return success({})
 
     def POST(self, *args):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         ret = self._post_handler()
         self.write(ret)
 
@@ -241,5 +244,6 @@ class DeviceEditHandler(core.Handler):
             return error(UAURET.SERVERERR)
 
     def POST(self, *args):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         ret = self._post_handler()
         self.write(ret)

@@ -83,6 +83,7 @@ class EyeSightInfoHandler(core.Handler):
 
     def GET(self):
         try:
+            self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
             data = self._get_handler()
             return data
         except Exception as e:
@@ -106,6 +107,7 @@ class EyeSightInfoHandler(core.Handler):
             return error(UAURET.SERVERERR)
 
     def POST(self, *arg):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         return self._post_handler()
 
 
@@ -164,4 +166,5 @@ class EyeRegisterHandler(core.Handler):
 
 
     def POST(self, *arg):
+        self.set_headers({'Content-Type': 'application/json; charset=UTF-8'})
         return self._post_handler()
