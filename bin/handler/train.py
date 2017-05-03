@@ -78,7 +78,7 @@ class TrainBuyInfoHandler(core.Handler):
 
     @with_database('uyu_core')
     def _total_stat(self):
-        sql = 'select count(*) as total from training_operator_record where create_time>0'
+        sql = 'select count(*) as total from training_operator_record where create_time>0 and channel_id=%d' % self.channel_id
         ret = self.db.get(sql)
         return int(ret['total']) if ret['total'] else 0
 
@@ -190,7 +190,7 @@ class TrainUseInfoHandler(core.Handler):
 
     @with_database('uyu_core')
     def _total_stat(self):
-        sql = 'select count(*) as total from training_use_record where ctime>0'
+        sql = 'select count(*) as total from training_use_record where ctime>0 and channel_id=%d' % self.channel_id
         ret = self.db.get(sql)
         return int(ret['total']) if ret['total'] else 0
 
