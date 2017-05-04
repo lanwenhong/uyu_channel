@@ -52,7 +52,6 @@ class SettleInfoHandler(core.Handler):
             uop.call('load_info_by_userid', self.user.userid)
             self.channel_id = uop.cdata['chnid']
 
-            # start, end = tools.gen_ret_range(curr_page, max_page_num)
             offset, limit = tools.gen_offset(curr_page, max_page_num)
             info_data = self._query_handler(offset, limit, start_time)
 

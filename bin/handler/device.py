@@ -47,14 +47,13 @@ class DeviceInfoHandler(core.Handler):
             max_page_num = params.get('maxnum')
             store_name = params.get('store_name')
             serial_number = params.get('serial_number')
-            status = params.get('status', None)
+            status = params.get('status', -1)
 
             self.user.load_user()
             self.user.load_profile()
             self.user.load_channel()
             self.user.channel_id = self.user.cdata['id']
 
-            # start, end = tools.gen_ret_range(curr_page, max_page_num)
             offset, limit = tools.gen_offset(curr_page, max_page_num)
             info_data = self._query_handler(offset, limit, store_name, serial_number, status)
 

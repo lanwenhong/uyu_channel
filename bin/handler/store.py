@@ -78,13 +78,12 @@ class StoreInfoHandler(core.Handler):
             max_page_num = params.get('maxnum')
             channel_name = params.get('channel_name')
             store_name = params.get('store_name')
-            is_valid = params.get('is_valid', None)
+            is_valid = params.get('is_valid', -1)
 
             uop = UUser()
             uop.call('load_info_by_userid', self.user.userid)
             self.channel_id = uop.cdata['chnid']
 
-            # start, end = tools.gen_ret_range(curr_page, max_page_num)
             offset, limit = tools.gen_offset(curr_page, max_page_num)
             info_data = self._query_handler(offset, limit, channel_name, store_name, is_valid)
 
