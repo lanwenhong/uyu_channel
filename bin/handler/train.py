@@ -215,6 +215,8 @@ class TrainUseInfoHandler(core.Handler):
             else:
                 return []
 
+        where['comsumer_nums'] = ('<', 0)
+
         if create_time:
             create_time = datetime.datetime.strptime(create_time, '%Y-%m-%d')
             start_time = create_time.replace(hour=0, minute=0, second=0)
