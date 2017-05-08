@@ -570,6 +570,8 @@ function get_remain_times(){
 
 
 function rules_select() {
+
+    $('.c_rules').html('');
     var get_data = {};
     var se_userid = window.localStorage.getItem('myid');
     get_data['se_userid'] = se_userid;
