@@ -577,7 +577,7 @@ function rules_select() {
     get_data['se_userid'] = se_userid;
 
     $.ajax({
-        url: '/channel/v1/api/rules_list',
+        url: '/channel/v1/api/chan_rule_info',
         type: 'GET',
         data: get_data,
         dataType: 'json',
@@ -596,7 +596,7 @@ function rules_select() {
 
                     var c_rules = $("#c_rules");
                     for(var i=0; i<data.data.length; i++){
-                        var rule_id = data.data[i].id;
+                        var rule_id = data.data[i].rule_id;
                         var rule_name = data.data[i].name;
                         var rule_total_amt = data.data[i].total_amt;
                         var rule_training_times = data.data[i].training_times;
