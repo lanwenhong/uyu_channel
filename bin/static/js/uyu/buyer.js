@@ -47,6 +47,14 @@ $(document).ready(function(){
         return this.optional(element) || (length > 0);
     }, "请联系运营分配套餐规则后购买");
 
+
+    $.validator.addMethod("CheckStore", function(value, element) {
+        var length = $('#store_name>option').length;
+        return this.optional(element) || (length > 0);
+    }, "请新建门店后分配");
+
+
+
     /*
     $("#training_times").bind('input propertychange', function () {
         var amount_per = 0;
@@ -478,7 +486,10 @@ $(document).ready(function(){
         var remain_times = parseInt($("#remain_times").text());
         var allocate_vt = $("#trainAllocateCreateForm").validate({
             rules: {
-
+                store_name: {
+                    required: true,
+                    CheckStore: '#store_name'
+                },
                 training_times: {
                     required: true,
                     //range:[1, remain_times],
@@ -495,7 +506,9 @@ $(document).ready(function(){
                 }
             },
             messages: {
-
+                store_name: {
+                    required: '请新建门店后分配'
+                },
                 training_times: {
                     required: '请输入分配的训练次数',
                     digits: "只能输入整数"
