@@ -41,6 +41,12 @@ $(document).ready(function(){
         return this.optional(element) || (length && money.test(value) && parseFloat(value) > 0);
     }, "请正确填写您的总金额");
 
+
+    $.validator.addMethod("CheckRule", function(value, element) {
+        var length = $('#c_rules>option').length;
+        return this.optional(element) || (length > 0);
+    }, "请联系运营分配套餐规则后购买");
+
     /*
     $("#training_times").bind('input propertychange', function () {
         var amount_per = 0;
@@ -56,11 +62,19 @@ $(document).ready(function(){
     });
     */
 
+
     $.validator.addMethod("isYuan", function(value, element) {
         var length = value.length;
-        var yuan  = /^([0-9]{1,6})\.([0-9]{1,2})$/;
-        return this.optional(element) || (length && yuan.test(value) && parseFloat(value) > 0);
+        if(value <=0){
+            return false;
+        }
+        else {
+            var yuan = /^([0-9]{1,8})(.([0-9]{1,2})){0,1}$/;
+            return this.optional(element) || (length && yuan.test(value) && parseFloat(value) > 0);
+        }
     }, "请正确填写您的价格");
+
+
 
     $('#trainBuyerList').DataTable({
         "autoWidth": false,     //通常被禁用作为优化
@@ -218,11 +232,19 @@ $(document).ready(function(){
     $("#trainBuyerCreateSubmit").click(function(){
         var buyer_vt = $("#trainBuyerCreateForm").validate({
             rules: {
+                c_rules: {
+                    required: true,
+                    CheckRule: '#c_rules'
+                },
                 training_times: {
                     required: true,
                     //range:[10, 100],
                     digits: true,
                     //CheckTrainingTimes: "#training_times"
+                },
+                training_amt: {
+                    required: true,
+                    isYuan: '#training_amt'
                 },
                 remark: {
                     required: false,
@@ -230,10 +252,16 @@ $(document).ready(function(){
                 }
             },
             messages: {
+                c_rules: {
+                    required: '请联系运营分配套餐规则后购买',
+                },
                 training_times: {
                     required: '请输入购买的训练次数',
                     //range: $.validator.format("请输入一个介于 {0} 和 {1} 之间的值")
                     digits: "只能输入整数"
+                },
+                training_amt: {
+                    required: '请输入金额'
                 },
                 remark: {
                     maxlength: $.validator.format("请输入一个长度最多是 {0} 的字符")
@@ -450,6 +478,7 @@ $(document).ready(function(){
         var remain_times = parseInt($("#remain_times").text());
         var allocate_vt = $("#trainAllocateCreateForm").validate({
             rules: {
+
                 training_times: {
                     required: true,
                     //range:[1, remain_times],
@@ -466,6 +495,7 @@ $(document).ready(function(){
                 }
             },
             messages: {
+
                 training_times: {
                     required: '请输入分配的训练次数',
                     digits: "只能输入整数"
@@ -591,6 +621,7 @@ function rules_select() {
             }
             else {
                 if(data.data.length==0){
+                    toastr.warning('请联系运营分配套餐规则后购买');
                     return false;
                 }  else {
 
