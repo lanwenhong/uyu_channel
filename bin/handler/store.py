@@ -87,10 +87,11 @@ class StoreInfoHandler(core.Handler):
             self.channel_id = uop.cdata['chnid']
 
             offset, limit = tools.gen_offset(curr_page, max_page_num)
-            info_data = self._query_handler(offset, limit, channel_name, store_name, is_valid)
+            info_data, total = self._query_handler(offset, limit, channel_name, store_name, is_valid)
 
             data['info'] = self._trans_record(info_data)
-            data['num'] = self._total_stat()
+            # data['num'] = self._total_stat()
+            data['num'] = total
             return success(data)
         except Exception as e:
             log.warn(e)
@@ -127,7 +128,12 @@ class StoreInfoHandler(core.Handler):
 
         ret = self.db.select_join(table1='stores', table2='channel', on={'channel.id': 'stores.channel_id'}, fields=keep_fields, where=where, other=other)
 
-        return ret
+        where.update({'stores.ctime': ('>', 0)})
+        stat = self.db.select_join(table1='stores', table2='channel', on={'channel.id': 'stores.channel_id'}, fields='count(*) as total', where=where)
+        log.debug('stores stat: %s', stat)
+        total = int(stat[0]['total']) if stat[0]['total'] else 0
+
+        return ret, total
 
 
     @with_database('uyu_core')

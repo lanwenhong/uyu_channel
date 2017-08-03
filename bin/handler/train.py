@@ -64,10 +64,11 @@ class TrainBuyInfoHandler(core.Handler):
             self.channel_id = uop.cdata['chnid']
 
             offset, limit = tools.gen_offset(curr_page, max_page_num)
-            info_data = self._query_handler(offset, limit, op_type, start_time, end_time)
+            info_data, total = self._query_handler(offset, limit, op_type, start_time, end_time)
 
             data['info'] = self._trans_record(info_data)
-            data['num'] = self._total_stat()
+            # data['num'] = self._total_stat()
+            data['num'] = total
             return success(data)
         except Exception as e:
             log.warn(e)
@@ -106,7 +107,12 @@ class TrainBuyInfoHandler(core.Handler):
         ]
         ret = self.db.select(table='training_operator_record', fields=keep_fields, where=where, other=other)
 
-        return ret
+        where.update({'create_time': ('>', 0)})
+        stat = self.db.select_one(table='training_operator_record', fields='count(*) as total', where=where)
+        log.debug('training_operator_record stat:%s', stat)
+        total = int(stat['total']) if stat else 0
+
+        return ret, total
 
 
     @with_database('uyu_core')
@@ -176,10 +182,11 @@ class TrainUseInfoHandler(core.Handler):
             self.channel_id = uop.cdata['chnid']
 
             offset, limit = tools.gen_offset(curr_page, max_page_num)
-            info_data = self._query_handler(offset, limit, store_name, consumer_id, eyesight, create_time)
+            info_data, total = self._query_handler(offset, limit, store_name, consumer_id, eyesight, create_time)
 
             data['info'] = self._trans_record(info_data)
-            data['num'] = self._total_stat()
+            # data['num'] = self._total_stat()
+            data['num'] = total
             return success(data)
         except Exception as e:
             log.warn(e)
@@ -203,7 +210,7 @@ class TrainUseInfoHandler(core.Handler):
             if store_list:
                 where.update({'store_id': ('in', store_list)})
             else:
-                return []
+                return [], 0
 
         if consumer_id:
             where.update({'consumer_id': consumer_id})
@@ -213,7 +220,7 @@ class TrainUseInfoHandler(core.Handler):
             if eyesight_list:
                 where.update({'eyesight_id': ('in', eyesight_list)})
             else:
-                return []
+                return [], 0
 
         where['comsumer_nums'] = ('<', 0)
 
@@ -229,7 +236,12 @@ class TrainUseInfoHandler(core.Handler):
 
         ret = self.db.select(table='training_use_record', fields=keep_fields, where=where, other=other)
 
-        return ret
+        where.update({'ctime': ('>', 0)})
+        stat = self.db.select_one(table='training_use_record', fields='count(*) as total', where=where)
+        log.debug('training_use_record stat: %s', stat)
+        total = int(stat['total']) if stat else 0
+
+        return ret, total
 
     @with_database('uyu_core')
     def _trans_record(self, data):

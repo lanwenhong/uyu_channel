@@ -53,10 +53,11 @@ class SettleInfoHandler(core.Handler):
             self.channel_id = uop.cdata['chnid']
 
             offset, limit = tools.gen_offset(curr_page, max_page_num)
-            info_data = self._query_handler(offset, limit, start_time)
+            info_data, total = self._query_handler(offset, limit, start_time)
 
             data['info'] = self._trans_record(info_data)
-            data['num'] = self._total_stat()
+            # data['num'] = self._total_stat()
+            data['num'] = total
             return success(data)
         except Exception as e:
             log.warn(traceback.format_exc())
@@ -87,7 +88,13 @@ class SettleInfoHandler(core.Handler):
             where.update({'settle_cycle': ('between', [stime, etime])})
 
         ret = self.db.select(table='settlement_record', fields=keep_fields, where=where, other=other)
-        return ret
+
+        where.update({'ctime': ('>', 0)})
+        stat = self.db.select_one(table='settlement_record', fields='count(*) as total', where=where)
+        log.debug('settlement_record stat: %s', stat)
+        total = int(stat['total']) if stat else 0
+
+        return ret, total
 
     @with_database('uyu_core')
     def _trans_record(self, data):
