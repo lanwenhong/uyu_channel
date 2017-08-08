@@ -334,6 +334,7 @@ $(document).ready(function(){
 
         var get_data = {};
         var se_userid = window.localStorage.getItem('myid');
+        var is_prepayment = window.localStorage.getItem('is_prepayment');
         get_data.se_userid = se_userid;
 
         $.ajax({
@@ -363,6 +364,13 @@ $(document).ready(function(){
                             var st_training_amt_per = (training_amt_per / 100).toFixed(2);
                             $("#a_store_training_amt_per").val(st_training_amt_per);
                         }
+                    }
+                    if(is_prepayment === 0) {
+                        // 次卡模式
+                        $('#allocate_training_amt_per').hide();
+                    } else {
+                        // 分成模式
+                        $('#allocate_training_amt_per').show();
                     }
                     $("#trainAllocateCreateModal").modal();
                 }
