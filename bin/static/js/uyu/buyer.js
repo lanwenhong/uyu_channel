@@ -365,7 +365,7 @@ $(document).ready(function(){
                             $("#a_store_training_amt_per").val(st_training_amt_per);
                         }
                     }
-                    if(is_prepayment === 0) {
+                    if(is_prepayment === '0') {
                         // 次卡模式
                         $('#allocate_training_amt_per').hide();
                     } else {
