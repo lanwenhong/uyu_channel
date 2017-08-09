@@ -474,13 +474,17 @@ $(document).ready(function(){
                     $('#e_contact_email').val(p_data.contact_email);
                     $('#e_address').val(p_data.address);
                     $('#e_training_amt_per').val(ch_data.training_amt_per / 100.0);
+                    $('#e_divide_percent').val(ch_data.divide_percent);
                     var is_prepayment = ch_data.is_prepayment;
                     $('#e_is_prepayment').val(is_prepayment);
-                    if(is_prepayment == 0){
+                    if(is_prepayment === '0'){
+                        // 次卡模式
                         $('#edit_store_divide_percent').hide();
+                        $('#edit_training_amt_per').hide();
                     } else {
-                        $('#e_divide_percent').val(ch_data.divide_percent);
+                        // 分成模式
                         $('#edit_store_divide_percent').show();
+                        $('#edit_training_amt_per').show();
                     }
                     $('#e_store_name').val(ch_data.store_name);
                     //$('#e_store_contacter').val(ch_data.store_contacter);
@@ -899,21 +903,29 @@ $(document).ready(function(){
 
     $('.is_prepayment').change(function(){
         var is_prepayment = $('.is_prepayment').val();
-        if(is_prepayment==0){
+        if(is_prepayment === '0'){
+            // 次卡模式
             $('#divide_percent').next('label').remove();
             $('#create_store_divide_percent').hide();
+            $('#create_training_amt_per').hide();
         }else{
+            // 分成模式
             $('#create_store_divide_percent').show();
+            $('#create_training_amt_per').show();
         }
     });
 
     $('#e_is_prepayment').change(function(){
         var is_prepayment= $('#e_is_prepayment').val();
-        if(is_prepayment==0){
+        if(is_prepayment === '0'){
+            // 次卡模式
             $('#e_divide_percent').next('label').remove();
             $('#edit_store_divide_percent').hide();
+            $('#edit_training_amt_per').hide();
         }else{
+            // 分成模式
             $('#edit_store_divide_percent').show();
+            $('#edit_training_amt_per').show();
         }
     });
 
